@@ -4,7 +4,7 @@ Created from the original Create React App. An extension of the tool that aims t
 
 All documentation from the original project follows below.
 
-The project structure is based on (https://medium.com/@alexmngn/how-to-better-organize-your-react-applications-2fd3ea1920f1).
+The project structure is based on [How To Better Organize Your React Applications](https://medium.com/@alexmngn/how-to-better-organize-your-react-applications-2fd3ea1920f1).
 
 ### Added functionality
 
