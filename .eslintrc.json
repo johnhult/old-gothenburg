@@ -4,6 +4,7 @@
 		"es6": true
 	},
 	"extends": "eslint:recommended",
+	"parser": "babel-eslint",
 	"parserOptions": {
 		"ecmaFeatures": {
 			"experimentalObjectRestSpread": true,
@@ -18,6 +19,23 @@
 		"indent": [
 			"error",
 			"tab"
+		],
+		"brace-style": [
+			"error",
+			"stroustrup"
+		],
+		"no-mixed-spaces-and-tabs": [
+			"error",
+			"smart-tabs"
+		],
+		"sort-vars": "error",
+		"sort-keys": [
+			"error",
+			"asc",
+			{
+				"caseSensitive": false,
+				"natural": true
+			}
 		],
 		"linebreak-style": [
 			"error",

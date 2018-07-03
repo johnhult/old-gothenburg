@@ -1,15 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import 'index.css';
 import {
 	BrowserRouter as Router,
 	Route,
 	Switch,
 	browserHistory
 } from 'react-router-dom';
+
+import 'index.css';
 import Home from 'containers/Home/Home';
-
-
 
 // Here you can add global headers and footers that will stay the same over different pages
 const App = () => (
@@ -17,7 +16,6 @@ const App = () => (
 		<Main />
 	</div>
 );
-
 
 // Add other routes inside Switch to change pages here
 const Main = () => (
@@ -28,9 +26,9 @@ const Main = () => (
 	</main>
 );
 
-ReactDOM.render((
+ReactDOM.render(
 	<Router history={browserHistory}>
 		<App />
-	</Router>
-), document.getElementById('root')
+	</Router>,
+	document.getElementById('root')
 );
