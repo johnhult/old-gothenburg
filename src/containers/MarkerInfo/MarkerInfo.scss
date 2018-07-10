@@ -12,19 +12,20 @@
 	}
 	@media screen and (min-width: 800px) {
 		width: 0;
-		height: 100vh;
+		height: 100%;
 		transition: 1s width;
 	}
 }
 .MarkerInfo--open {
-	height: 80vh;
+	height: 80%;
 	.MarkerText {
 		opacity: 1;
 		transition: 1s 0.8s;
 	}
 	@media screen and (min-width: 800px) {
-		height: 100vh;
+		height: 100%;
 		width: 50vw;
+		max-width: 400px;
 	}
 }
 .MarkerInfoWrapper {

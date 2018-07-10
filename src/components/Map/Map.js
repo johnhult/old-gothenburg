@@ -10,8 +10,9 @@ import MapStyle from 'data/MAP-STYLE.json';
 const MAP = {
 	defaultZoom: 14,
 	options: {
+		fullscreenControl: false,
 		maxZoom: 19,
-		minZoom: 2,
+		minZoom: 8,
 		styles: MapStyle
 	}
 };
@@ -20,21 +21,21 @@ class Map extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			bounds: null,
 			clusters: [],
 			defaultCenter: {
 				...this.props.userPos
 			},
 			error: null,
 			geolocation: null,
-			// hasInitPanned: false,
 			loading: false,
 			map: null,
 			mapOptions: {
+				bounds: null,
 				center: { ...this.props.userPos },
 				zoom: MAP.defaultZoom
 			},
 			maps: null
-			// userPos: null
 		};
 	}
 
@@ -56,27 +57,71 @@ class Map extends Component {
 		return clusters(this.state.mapOptions);
 	};
 
-	createClusters = props => {
+	createClusters = () => {
 		this.setState({
 			clusters: this.state.mapOptions.bounds
-				? this.getClusters(props).map(
-						({ wx, wy, numPoints, points }) => ({
-							id: `${numPoints}_${points[0].id}`,
-							lat: wy,
-							lng: wx,
-							numPoints,
-							points
-						})
-				  )
+				? this.getClusters().map(({ wx, wy, numPoints, points }) => ({
+					id: `${numPoints}_${points[0].id}`,
+					lat: wy,
+					lng: wx,
+					numPoints,
+					points
+				  }))
 				: []
 		});
 	};
 
-	handleMapChange = ({ center, zoom, bounds }) => {
+	setDefaultBounds = maps => {
+		let newBounds = new maps.LatLngBounds();
+		this.props.markers.forEach(item => {
+			newBounds.extend({
+				lat: item.geo.latitude,
+				lng: item.geo.longitude
+			});
+		});
+
+		let increasePercentage = 1.1;
+		let NE = newBounds.getNorthEast();
+		let SW = newBounds.getSouthWest();
+
+		// Increase bounds
+		let latAdjustment = (NE.lat() - SW.lat()) * (increasePercentage - 1);
+		let lngAdjustment = (NE.lng() - SW.lng()) * (increasePercentage - 1);
+		var newNE = new maps.LatLng(
+			NE.lat() + latAdjustment,
+			NE.lng() + lngAdjustment
+		);
+		var newSW = new maps.LatLng(
+			SW.lat() - latAdjustment,
+			SW.lng() - lngAdjustment
+		);
+
+		// North West
+		let NW = new maps.LatLng(newNE.lat(), newSW.lng());
+		// South East
+		let SE = new maps.LatLng(newSW.lat(), newNE.lng());
+		let otherBounds = {
+			ne: { lat: newNE.lat(), lng: newNE.lng() },
+			nw: { lat: NW.lat(), lng: NW.lng() },
+			se: { lat: SE.lat(), lng: SE.lng() },
+			sw: { lat: newSW.lat(), lng: newSW.lng() }
+		};
+
+		return otherBounds;
+	};
+
+	handleMapChange = ({ center, zoom }, doNotReturn) => {
+		if (
+			(zoom === this.state.mapOptions.zoom || !this.state.bounds) &&
+			!doNotReturn
+		) {
+			return;
+		}
+
 		this.setState(
 			{
 				mapOptions: {
-					bounds,
+					bounds: this.state.bounds,
 					center,
 					zoom
 				}
@@ -95,7 +140,10 @@ class Map extends Component {
 		let keyId = key.substr(key.indexOf('_'), key.length).replace('_', '');
 		let numPoints = parseInt(clusterIdentifier, 10);
 		if (numPoints && numPoints > 1) {
-			this.zoomOnCluster();
+			let clickedMarker = this.state.clusters.find(
+				correctMarker => correctMarker.id === key
+			);
+			this.zoomOnCluster(clickedMarker);
 		}
 		else {
 			let clickedMarker = this.props.markers.find(
@@ -109,17 +157,15 @@ class Map extends Component {
 		}
 	};
 
-	zoomOnCluster() {}
-
-	// handleLocationError(browserHasGeolocation, infoWindow, pos, map) {
-	// 	infoWindow.setPosition(pos);
-	// 	infoWindow.setContent(
-	// 		browserHasGeolocation
-	// 			? 'Error: The Geolocation service failed.'
-	// 			: 'Error: Your browser doesn\'t support geolocation.'
-	// 	);
-	// 	infoWindow.open(map);
-	// }
+	zoomOnCluster(clickedMarker) {
+		let zoom = this.state.map.getZoom();
+		this.state.map.panTo({
+			lat: clickedMarker.lat,
+			lng: clickedMarker.lng
+		});
+		zoom = zoom + 2 > 19 ? 19 : zoom + 2;
+		this.state.map.setZoom(zoom);
+	}
 
 	initMap = (map, maps) => {
 		if (!map || !maps) {
@@ -129,65 +175,23 @@ class Map extends Component {
 			});
 			return;
 		}
-		this.setState({
-			map: map,
-			maps: maps
-		});
+		this.setState(
+			{
+				bounds: this.setDefaultBounds(maps),
+				map: map,
+				maps: maps
+			},
+			() => {
+				this.handleMapChange(
+					{
+						center: this.state.mapOptions.center,
+						zoom: this.state.mapOptions.zoom
+					},
+					true
+				);
+			}
+		);
 	};
-
-	// initMap = (map, maps) => {
-	// 	if (!map || !maps) {
-	// 		this.setState({
-	// 			error:
-	// 				'Could not properly load Google Maps. Please check your internet connection and reload page.'
-	// 		});
-	// 		return;
-	// 	}
-	// 	let infoWindow = new maps.InfoWindow();
-	// 	this.setState({
-	// 		map: map,
-	// 		maps: maps
-	// 	});
-	// 	if (navigator.geolocation) {
-	// 		navigator.geolocation.watchPosition(
-	// 			position => {
-	// 				this.setState({
-	// 					userPos: {
-	// 						lat: position.coords.latitude,
-	// 						lng: position.coords.longitude
-	// 					}
-	// 				});
-	// 			},
-	// 			() => {
-	// 				this.handleLocationError(
-	// 					true,
-	// 					infoWindow,
-	// 					map.getCenter(),
-	// 					map
-	// 				);
-	// 				this.setState({
-	// 					error:
-	// 						'Allow your device to use location for a full fledged experience.'
-	// 				});
-	// 			}
-	// 		);
-	// 	}
-	// 	else {
-	// 		this.handleLocationError(false, infoWindow, map.getCenter(), map);
-	// 	}
-	// };
-
-	// componentDidUpdate(prevProps, prevState) {
-	// 	if (
-	// 		this.state.userPos !== prevState.userPos &&
-	// 		this.state.map &&
-	// 		this.state.maps &&
-	// 		!this.state.hasInitPanned
-	// 	) {
-	// 		this.setState({ hasInitPanned: true });
-	// 		this.state.map.panTo(this.state.userPos);
-	// 	}
-	// }
 
 	render() {
 		return (
@@ -197,6 +201,7 @@ class Map extends Component {
 				}}
 				defaultCenter={this.state.defaultCenter}
 				defaultZoom={MAP.defaultZoom}
+				experimental
 				onChange={this.handleMapChange}
 				onChildClick={this.handleChildClick}
 				onGoogleApiLoaded={({ map, maps }) => this.initMap(map, maps)}

@@ -4,7 +4,7 @@
 		"elementType": "geometry.fill",
 		"stylers": [
 			{
-				"visibility": "on"
+				"visibility": "hidden"
 			},
 			{
 				"color": "#e0efef"
@@ -13,6 +13,14 @@
 	},
 	{
 		"featureType": "poi",
+		"stylers": [
+			{
+				"visibility": "off"
+			}
+		]
+	},
+	{
+		"featureType": "poi.attraction",
 		"elementType": "geometry.fill",
 		"stylers": [
 			{

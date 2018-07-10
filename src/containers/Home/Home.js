@@ -84,6 +84,9 @@ class Home extends Component {
 					this.setState({
 						error: ERROR.noUserPos
 					});
+				},
+				{
+					timeout: 60000
 				}
 			);
 		}
