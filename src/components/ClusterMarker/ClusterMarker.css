@@ -1,0 +1,15 @@
+.ClusterMarker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  width: 40px;
+  border-radius: 40px;
+  background-color: black;
+  color: white;
+  font-size: 1.4rem;
+  transform: translate(-50%, -50%); }
+  .ClusterMarker span {
+    position: relative;
+    top: -1px;
+    right: -1px; }

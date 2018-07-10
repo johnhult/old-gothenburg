@@ -1,0 +1,26 @@
+@import 'style-extra/variables.scss';
+
+.CloseIcon {
+	width: 30px;
+	height: 30px;
+	margin: 10px;
+	position: relative;
+	transform: rotateZ(45deg);
+	&::before, &::after {
+		content: "";
+		position: absolute;
+		left: 14px;
+		width: 1px;
+		height: 30px;
+		background-color: $mediumGrey;
+		transition: 0.3s;
+	}
+	&::after {
+		transform: rotateZ(90deg);
+	}
+	&:hover {
+		&::before, &::after {
+			background-color: $darkGrey;
+		}
+	}
+}

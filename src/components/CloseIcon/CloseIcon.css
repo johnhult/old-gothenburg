@@ -1,0 +1,18 @@
+.CloseIcon {
+  width: 30px;
+  height: 30px;
+  margin: 10px;
+  position: relative;
+  transform: rotateZ(45deg); }
+  .CloseIcon::before, .CloseIcon::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    width: 1px;
+    height: 30px;
+    background-color: #999999;
+    transition: 0.3s; }
+  .CloseIcon::after {
+    transform: rotateZ(90deg); }
+  .CloseIcon:hover::before, .CloseIcon:hover::after {
+    background-color: #666666; }
