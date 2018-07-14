@@ -1,0 +1,17 @@
+.InnerMap {
+	height: 0;
+	width: 100vw;
+	flex: 1;
+	@media screen and (min-width: 800px) {
+		height: 100%;
+	}
+}
+
+.UserPositionButton {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	font-size: 1.2rem;
+	text-transform: uppercase;
+	font-weight: 900;
+}

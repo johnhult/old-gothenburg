@@ -1,0 +1,26 @@
+@import 'style-extra/variables.scss';
+
+.LoadingHeader {
+	height: 50px;
+	margin-bottom: 20px;
+	display: flex;
+	align-items: center;
+}
+.LoadingHeader-mock {
+	height: 20px;
+	width: 200px;
+	max-width: 100%;
+	background-color: $mediumGrey;
+	border-radius: 3px;
+}
+.LoadingText-mock {
+	height: 8px;
+	width: 100%;
+	margin-bottom: 20px;
+	max-width: 100%;
+	background-color: $lightGrey;
+	border-radius: 3px;
+	&--small {
+		width: 80%;
+	}
+}

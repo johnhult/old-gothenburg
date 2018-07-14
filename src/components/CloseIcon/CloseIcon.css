@@ -1,7 +1,7 @@
 .CloseIcon {
   width: 30px;
   height: 30px;
-  margin: 10px;
+  margin: 0 10px;
   position: relative;
   transform: rotateZ(45deg); }
   .CloseIcon::before, .CloseIcon::after {

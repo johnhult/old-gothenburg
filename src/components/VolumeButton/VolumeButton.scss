@@ -1,0 +1,76 @@
+@import "style-extra/variables.scss";
+
+.VolumeButton {
+	cursor: pointer;
+	position: absolute;
+	right: 0px;
+	width: 50px;
+	height: 100%;
+	background-color: white;
+	overflow: hidden;
+	transition: 0.5s;
+}
+.VolumeButtonWrapper {
+	width: 100%;
+	height: 100%;
+}
+.VolumeButton--open {
+	width: 100%;
+	.VolumeBar {
+		opacity: 1;
+		transition: 0.2s 0.2s;
+	}
+	.CloseVolume {
+		opacity: 1;
+		transition: 0.2s 0.2s;
+		pointer-events: initial;
+	}
+}
+.AudioVolume {
+	pointer-events: none;
+	position: absolute;
+	top: 15px;
+	left: 10px;
+	width: 30px;
+	height: 30px;
+	* {
+		fill: $lightGrey;
+	}
+}
+.VolumeBar {
+	position: absolute;
+	top: 26px;
+	left: 50px;
+	width: calc(100% - 100px);
+	height: 30px;
+	opacity: 0;
+	transition: 0.2s;
+}
+progress[value].VolumeBar {
+	appearance: none;
+	background-color: $blue;
+	height: 8px;
+	border: 1px solid $blue;
+	border-radius: 50px;
+}
+
+progress[value].VolumeBar::-webkit-progress-bar {
+	background-color: white;
+	border-radius: 50px;
+	}
+
+progress.VolumeBar::-webkit-progress-value {
+	border-radius: 50px;
+	background-color: $blue;
+}
+
+.CloseVolume {
+	position: absolute;
+	top: 15px;
+	left: calc(100% - 50px);
+	height: 30px;
+	transition: 0.2s 0.2s;
+	opacity: 0;
+	transition: 0.2s;
+	pointer-events: none;
+}

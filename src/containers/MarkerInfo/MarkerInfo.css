@@ -1,34 +1,66 @@
 .MarkerInfo {
   width: 100vw;
   height: 0;
-  transition: 1s height;
+  transition: 0.6s height;
   background-color: white;
   flex-shrink: 0;
   z-index: 10;
   text-align: left; }
-  .MarkerInfo .MarkerText {
+  .MarkerInfo .MarkerInfoWrapper {
     opacity: 0;
+    transition: 0.2s; }
+  .MarkerInfo .ExitAndLoadInfo {
+    opacity: 1;
     transition: 0.2s; }
   @media screen and (min-width: 800px) {
     .MarkerInfo {
       width: 0;
       height: 100%;
-      transition: 1s width; } }
+      transition: 0.6s width;
+      max-width: 400px; } }
 
 .MarkerInfo--open {
   height: 80%; }
-  .MarkerInfo--open .MarkerText {
+  .MarkerInfo--open .MarkerInfoWrapper {
     opacity: 1;
-    transition: 1s 0.8s; }
+    transition: 0.6s 0.3s; }
   @media screen and (min-width: 800px) {
     .MarkerInfo--open {
       height: 100%;
-      width: 50vw;
-      max-width: 400px; } }
+      width: 400px; } }
+
+.ExitAndLoadInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  opacity: 0; }
+  .ExitAndLoadInfo span {
+    color: #7dcdcd;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    font-weight: 900;
+    margin-right: 10px; }
 
 .MarkerInfoWrapper {
   width: 100%;
-  height: 100%; }
+  height: 100%;
+  padding-top: 10px; }
 
 .MarkerText {
-  padding: 0 5% 20px; }
+  padding: 0 5% 20px;
+  height: calc(100% - 40px);
+  overflow: auto; }
+
+.MarkerHeader {
+  margin-bottom: 10px; }
+
+.MarkerAudio {
+  margin-bottom: 10px; }
+
+.MarkerLoadingSpinner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; }
+  .MarkerLoadingSpinner .Spinner {
+    margin: 0 20px 0 0; }

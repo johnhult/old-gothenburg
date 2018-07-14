@@ -1,0 +1,58 @@
+.AudioPlayer {
+  width: 100%;
+  border: 1px solid #e6e6e6;
+  padding: 10px;
+  padding-right: 50px;
+  margin-bottom: 10px;
+  position: relative; }
+
+.AudioPlayer--extended {
+  padding-right: 10px; }
+
+.PlayerControls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; }
+
+.PlayButton {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50px;
+  background-color: #7dcdcd;
+  display: flex;
+  align-items: center;
+  justify-content: center; }
+
+.AudioIcon {
+  pointer-events: none;
+  width: 20px;
+  height: 20px; }
+  .AudioIcon div {
+    width: 100%;
+    height: 100%; }
+  .AudioIcon * {
+    fill: white; }
+
+.CurrentTime {
+  margin: 0 5px; }
+
+.ProgressBar {
+  cursor: pointer;
+  flex: 1;
+  margin: 0 5px; }
+
+progress[value].ProgressBar {
+  appearance: none;
+  background-color: #7dcdcd;
+  height: 8px;
+  border: 1px solid #7dcdcd;
+  border-radius: 50px; }
+
+progress[value].ProgressBar::-webkit-progress-bar {
+  background-color: white;
+  border-radius: 50px; }
+
+progress.ProgressBar::-webkit-progress-value {
+  border-radius: 50px;
+  background-color: #7dcdcd; }

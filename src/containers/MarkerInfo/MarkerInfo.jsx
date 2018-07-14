@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import AudioPlayer from '../../components/AudioPlayer/AudioPlayer';
 import CloseIcon from 'components/CloseIcon/CloseIcon.jsx';
-
+import LoadingMarkerInfo from 'components/LoadingMarkerInfo/LoadingMarkerInfo';
+import Spinner from 'components/Spinner/Spinner.jsx';
 import './MarkerInfo.css';
 
 class MarkerInfo extends Component {
@@ -10,6 +12,24 @@ class MarkerInfo extends Component {
 		super(props);
 		this.state = {};
 	}
+
+	getLayout = () => {
+		return !this.props.infoLoading && this.props.markerInfo ? (
+			<div className="MarkerText">
+				<h1 className="MarkerHeader">{this.props.markerInfo.header}</h1>
+				<AudioPlayer
+					markerKey={this.props.markerInfo.key}
+					infoOpen={this.props.infoOpen}
+					audioPath={this.props.markerInfo.audioPath}
+				/>
+				<p>{this.props.markerInfo.text}</p>
+			</div>
+		) : (
+			<div className="MarkerText">
+				<LoadingMarkerInfo />
+			</div>
+		);
+	};
 
 	render() {
 		return (
@@ -19,20 +39,15 @@ class MarkerInfo extends Component {
 				}`}
 			>
 				<div className="MarkerInfoWrapper">
-					<CloseIcon handleClick={this.props.close} />
-					{this.props.markerInfo ? (
-						<div className="MarkerText">
-							<h1>{this.props.markerInfo.header}</h1>
-							<p>{this.props.markerInfo.text}</p>
-							<audio controls>
-								<source
-									src={this.props.markerInfo.audioPath}
-									type="audio/mp3"
-								/>
-								Your device doesn't support audio format.
-							</audio>
-						</div>
-					) : null}
+					<div className="ExitAndLoadInfo">
+						<CloseIcon handleClick={this.props.close} />
+						{!this.props.infoLoading ? null : (
+							<span className="MarkerLoadingSpinner">
+								<Spinner size={30} />Loading content
+							</span>
+						)}
+					</div>
+					{this.getLayout()}
 				</div>
 			</div>
 		);
@@ -44,12 +59,11 @@ MarkerInfo.defaultProps = {
 	//	label: 'click me'
 };
 
-MarkerInfo.PropTypes = {
+MarkerInfo.propTypes = {
 	close: PropTypes.func.isRequired,
-	markerInfo: PropTypes.object.isRequired
-	//	Example PropTypes:
-	//	label: PropTypes.string.isRequired,
-	//	onClick: PropTypes.func,
+	infoLoading: PropTypes.bool.isRequired,
+	infoOpen: PropTypes.bool,
+	markerInfo: PropTypes.object
 };
 
 export default MarkerInfo;

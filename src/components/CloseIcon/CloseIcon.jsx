@@ -10,7 +10,12 @@ class CloseIcon extends Component {
 	}
 
 	render() {
-		return <div className="CloseIcon" onClick={this.props.handleClick} />;
+		return (
+			<div
+				className={`CloseIcon ${this.props.className || ''}`}
+				onClick={this.props.handleClick}
+			/>
+		);
 	}
 }
 
@@ -19,7 +24,7 @@ CloseIcon.defaultProps = {
 	//	label: 'click me'
 };
 
-CloseIcon.PropTypes = {
+CloseIcon.propTypes = {
 	handleClick: PropTypes.func.isRequired
 	//	Example PropTypes:
 	//	label: PropTypes.string.isRequired,

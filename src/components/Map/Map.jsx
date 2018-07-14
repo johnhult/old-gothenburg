@@ -3,17 +3,28 @@ import PropTypes from 'prop-types';
 import GoogleMapReact from 'google-map-react';
 import supercluster from 'points-cluster';
 
+import Button from 'components/Button/Button.jsx';
 import ClusterMarker from 'components/ClusterMarker/ClusterMarker.jsx';
 import Marker from 'components/Marker/Marker.jsx';
 import MapStyle from 'data/MAP-STYLE.json';
+import './Map.css';
 
 const MAP = {
+	defaultCenter: {
+		lat: 57.70887,
+		lng: 11.97456
+	},
 	defaultZoom: 14,
 	options: {
+		clickableIcons: false,
+		draggable: true,
 		fullscreenControl: false,
 		maxZoom: 19,
 		minZoom: 8,
-		styles: MapStyle
+		panControl: true,
+		scrollwheel: true,
+		styles: MapStyle,
+		zoomControl: true
 	}
 };
 
@@ -23,21 +34,24 @@ class Map extends Component {
 		this.state = {
 			bounds: null,
 			clusters: [],
-			defaultCenter: {
-				...this.props.userPos
-			},
 			error: null,
 			geolocation: null,
-			loading: false,
+			loaded: false,
 			map: null,
 			mapOptions: {
 				bounds: null,
 				center: { ...this.props.userPos },
 				zoom: MAP.defaultZoom
 			},
-			maps: null
+			maps: null,
+			openMarker: null
 		};
 	}
+
+	centerOnUser = () => {
+		this.state.map.setZoom(16);
+		this.state.map.panTo(this.props.userPos);
+	};
 
 	getClusters = () => {
 		let markers = this.props.markers.map(item => {
@@ -71,7 +85,7 @@ class Map extends Component {
 		});
 	};
 
-	setDefaultBounds = maps => {
+	setDefaultBounds = (map, maps) => {
 		let newBounds = new maps.LatLngBounds();
 		this.props.markers.forEach(item => {
 			newBounds.extend({
@@ -80,7 +94,7 @@ class Map extends Component {
 			});
 		});
 
-		let increasePercentage = 1.1;
+		let increasePercentage = 1.01;
 		let NE = newBounds.getNorthEast();
 		let SW = newBounds.getSouthWest();
 
@@ -106,6 +120,10 @@ class Map extends Component {
 			se: { lat: SE.lat(), lng: SE.lng() },
 			sw: { lat: newSW.lat(), lng: newSW.lng() }
 		};
+
+		let fitBounds = new maps.LatLngBounds(newSW, newNE);
+
+		map.fitBounds(fitBounds);
 
 		return otherBounds;
 	};
@@ -133,7 +151,10 @@ class Map extends Component {
 	};
 
 	handleChildClick = key => {
-		if (key === 'user') {
+		if (
+			key === 'user' ||
+			(key === this.state.openMarker && this.props.infoOpen)
+		) {
 			return;
 		}
 		let clusterIdentifier = key.substr(0, key.indexOf('_'));
@@ -146,6 +167,9 @@ class Map extends Component {
 			this.zoomOnCluster(clickedMarker);
 		}
 		else {
+			this.setState({
+				openMarker: key
+			});
 			let clickedMarker = this.props.markers.find(
 				correctMarker => correctMarker.id === keyId
 			);
@@ -163,7 +187,7 @@ class Map extends Component {
 			lat: clickedMarker.lat,
 			lng: clickedMarker.lng
 		});
-		zoom = zoom + 2 > 19 ? 19 : zoom + 2;
+		zoom = zoom + 2 > MAP.options.maxZoom ? MAP.options.maxZoom : zoom + 2;
 		this.state.map.setZoom(zoom);
 	}
 
@@ -177,7 +201,8 @@ class Map extends Component {
 		}
 		this.setState(
 			{
-				bounds: this.setDefaultBounds(maps),
+				bounds: this.setDefaultBounds(map, maps),
+				loaded: true,
 				map: map,
 				maps: maps
 			},
@@ -193,62 +218,93 @@ class Map extends Component {
 		);
 	};
 
+	componentDidUpdate() {
+		if (!this.state.loaded) {
+			return;
+		}
+		let options = this.props.infoOpen
+			? {
+				draggable: false,
+				maxZoom: this.state.map.getZoom(),
+				minZoom: this.state.map.getZoom(),
+				panControl: false,
+				scrollwheel: false,
+				zoomControl: false
+			  }
+			: {
+				...MAP.options
+			  };
+		this.state.map.setOptions(options);
+	}
+
 	render() {
 		return (
-			<GoogleMapReact
-				bootstrapURLKeys={{
-					key: ''
-				}}
-				defaultCenter={this.state.defaultCenter}
-				defaultZoom={MAP.defaultZoom}
-				experimental
-				onChange={this.handleMapChange}
-				onChildClick={this.handleChildClick}
-				onGoogleApiLoaded={({ map, maps }) => this.initMap(map, maps)}
-				options={MAP.options}
-				yesIWantToUseGoogleMapApiInternals
-			>
-				{this.state.clusters.map(marker => {
-					if (marker.numPoints === 1) {
+			<div className="InnerMap">
+				<GoogleMapReact
+					bootstrapURLKeys={{
+						key: ''
+					}}
+					defaultCenter={MAP.defaultCenter}
+					defaultZoom={MAP.defaultZoom}
+					experimental
+					onChange={this.handleMapChange}
+					onChildClick={this.handleChildClick}
+					onGoogleApiLoaded={({ map, maps }) =>
+						this.initMap(map, maps)
+					}
+					options={MAP.options}
+					yesIWantToUseGoogleMapApiInternals
+				>
+					{this.state.clusters.map(marker => {
+						if (marker.numPoints === 1) {
+							return (
+								<Marker
+									key={marker.id}
+									lat={marker.lat}
+									lng={marker.lng}
+									type={marker.points[0].type}
+								/>
+							);
+						}
+
 						return (
-							<Marker
+							<ClusterMarker
 								key={marker.id}
 								lat={marker.lat}
 								lng={marker.lng}
-								type={marker.points[0].type}
+								nrOfPoints={marker.numPoints}
+								points={marker.points}
 							/>
 						);
-					}
-
-					return (
-						<ClusterMarker
-							key={marker.id}
-							lat={marker.lat}
-							lng={marker.lng}
-							nrOfPoints={marker.numPoints}
-							points={marker.points}
+					})}
+					{this.props.userPos ? (
+						<Marker
+							className="User"
+							key="user"
+							lat={this.props.userPos.lat}
+							lng={this.props.userPos.lng}
+							type="user"
 						/>
-					);
-				})}
-				{this.props.userPos ? (
-					<Marker
-						className="User"
-						key="user"
-						lat={this.props.userPos.lat}
-						lng={this.props.userPos.lng}
-						type="user"
+					) : null}
+				</GoogleMapReact>
+				{!this.props.infoOpen || !this.props.userPos ? (
+					<Button
+						className="UserPositionButton"
+						label="My position"
+						handleClick={e => this.centerOnUser(e)}
 					/>
 				) : null}
-			</GoogleMapReact>
+			</div>
 		);
 	}
 }
 
 Map.defaultProps = {};
 
-Map.PropTypes = {
+Map.propTypes = {
 	className: PropTypes.string,
 	handleMarkerClick: PropTypes.func.isRequired,
+	infoOpen: PropTypes.bool.isRequired,
 	markers: PropTypes.array,
 	userPos: PropTypes.object
 };

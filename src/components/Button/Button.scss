@@ -1,28 +1,17 @@
-button {
-	width: 200px;
-	height: 30px;
+@import 'style-extra/variables.scss';
+
+.btn {
+	padding: 5px 20px;
 	max-width: 90%;
-	background-color: rgba(white, 0.1);
-	border: 3px solid white;
+	background-color: white;
 	border-radius: 200px;
 	transition: .2s;
+	font-size: 900;
+	color: darken($blue, 10%);
+	color: $purple;
+	user-select: none;
+	box-shadow: 0px 3px 6px rgba(black, 0.3);
 	&:hover {
-		background-color: white;
-		color: black;
+		box-shadow: 0px 5px 10px rgba(black, 0.3);
 	}
-}
-
-.Big {
-	width: 300px;
-	height: 60px;
-	font-size: 2rem;
-}
-
-.Primary {
-	background-color: rgba(white, 0.2);
-	border-color: white;
-}
-.Secondary {
-	background-color: rgba(black, 0.2);
-	border-color: black;
 }

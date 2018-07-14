@@ -29,7 +29,9 @@ class Marker extends Component {
 			  }
 			: {
 				height: '30px',
-				transform: 'translate(-50%, -100%)',
+				left: '-15px',
+				position: 'relative',
+				top: '-30px',
 				width: '30px'
 			  };
 	};

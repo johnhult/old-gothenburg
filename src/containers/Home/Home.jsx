@@ -3,8 +3,9 @@ import firebase from 'firebase/app';
 import 'firebase/app';
 import 'firebase/firestore';
 
-import Map from 'components/Map/Map';
+import Map from 'components/Map/Map.jsx';
 import MarkerInfo from 'containers/MarkerInfo/MarkerInfo';
+import Spinner from 'components/Spinner/Spinner.jsx';
 import './Home.css';
 
 const ERROR = {
@@ -20,15 +21,19 @@ class Home extends Component {
 		this.state = {
 			data: null,
 			error: null,
+			infoLoading: false,
 			infoOpen: false,
 			loadingMarkers: true,
 			loadingUserPos: true,
+			markerDataLoaded: [],
 			markerInfo: null,
+			userError: null,
 			userPos: {
 				lat: 0,
 				lng: 0
 			}
 		};
+		this.openMarker = null;
 	}
 
 	getMessage = () => {
@@ -38,7 +43,7 @@ class Home extends Component {
 			if (this.state.loadingMarkers) {
 				message = (
 					<div>
-						<div className="Spinner" />
+						<Spinner />
 						<h1>Loading audio markers 🎵</h1>
 						<h4>Please wait</h4>
 					</div>
@@ -47,7 +52,7 @@ class Home extends Component {
 			else if (this.state.loadingUserPos) {
 				message = (
 					<div>
-						<div className="Spinner" />
+						<Spinner />
 						<h1>Loading user position 📍</h1>
 						<h4>Please wait</h4>
 					</div>
@@ -56,7 +61,6 @@ class Home extends Component {
 			else {
 				message = (
 					<div>
-						<div className="Spinner" />
 						<h1>Something went wrong, please reload...</h1>
 					</div>
 				);
@@ -82,10 +86,11 @@ class Home extends Component {
 				},
 				() => {
 					this.setState({
-						error: ERROR.noUserPos
+						userError: ERROR.noUserPos
 					});
 				},
 				{
+					enableHighAccuracy: true,
 					timeout: 60000
 				}
 			);
@@ -102,22 +107,52 @@ class Home extends Component {
 	};
 
 	handleMarkerClick = clickedMarker => {
-		this.setState({ infoOpen: true, openMarker: clickedMarker });
-		clickedMarker.markerInfo.get().then(querySnapshot => {
-			this.setState({ markerInfo: querySnapshot.data() });
+		this.setState({
+			infoLoading: true,
+			infoOpen: true
 		});
+		this.openMarker = clickedMarker;
+		let data = this.state.markerDataLoaded.find(
+			markerExist => markerExist.key === clickedMarker.markerInfo.id
+		);
+		if (data) {
+			this.setState({ infoLoading: false, markerInfo: data });
+		}
+		else {
+			clickedMarker.markerInfo.get().then(
+				querySnapshot => {
+					let dataFetchedKey = querySnapshot.id;
+					data = querySnapshot.data();
+					data = { ...data, key: dataFetchedKey };
+					if (dataFetchedKey === this.openMarker.markerInfo.id) {
+						this.setState({
+							infoLoading: false,
+							markerDataLoaded: [
+								...this.state.markerDataLoaded,
+								data
+							],
+							markerInfo: data
+						});
+					}
+					else {
+						this.setState({
+							markerDataLoaded: [
+								...this.state.markerDataLoaded,
+								data
+							]
+						});
+					}
+				},
+				() => {
+					this.setState({
+						infoLoading: false
+					});
+				}
+			);
+		}
 	};
 
 	initFirebase() {
-		// Initialize Firebase
-		let config = {
-			apiKey: '',
-			authDomain: 'old-gothenburg.firebaseapp.com',
-			databaseURL: 'https://old-gothenburg.firebaseio.com',
-			projectId: 'old-gothenburg'
-		};
-		firebase.initializeApp(config);
-
 		// Initialize Cloud Firestore through Firebase
 		let db = firebase.firestore();
 		let settings = {
@@ -126,8 +161,6 @@ class Home extends Component {
 
 		// Set settings because warnings
 		db.settings(settings);
-
-		this.setState({ db: db });
 
 		return db;
 	}
@@ -160,20 +193,21 @@ class Home extends Component {
 	}
 
 	render() {
-		return this.state.loadingMarkers ||
-			this.state.loadingUserPos ||
-			this.state.error ? (
+		return this.state.loadingMarkers || this.state.error ? (
 			<div className="Loading">{this.getMessage()}</div>
 		) : (
 			<div className="MapWrapper">
 				<Map
 					className="Map"
 					handleMarkerClick={this.handleMarkerClick}
+					infoOpen={this.state.infoOpen}
 					markers={this.state.data}
+					userError={this.state.userError}
 					userPos={this.state.userPos}
 				/>
 				<MarkerInfo
 					close={this.closeInfo}
+					infoLoading={this.state.infoLoading}
 					infoOpen={this.state.infoOpen}
 					markerInfo={this.state.markerInfo}
 				/>
