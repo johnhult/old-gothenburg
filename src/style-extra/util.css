@@ -1,0 +1,31 @@
+.u-meta {
+  font-size: 1.4rem;
+  font-weight: 900; }
+
+.u-flexCenterLeft {
+  display: flex;
+  align-items: center; }
+
+.u-flex1 {
+  flex: 1; }
+
+.u-inlineBlock {
+  display: inline-block; }
+
+.u-textRight {
+  text-align: right; }
+
+.u-width100 {
+  width: 100%; }
+
+.u-smallMargin {
+  margin-bottom: 5px; }
+
+.u-standardMargin {
+  margin-bottom: 10px; }
+
+.u-bigMargin {
+  margin-bottom: 20px; }
+
+.u-doubleMargin {
+  margin-bottom: 40px; }

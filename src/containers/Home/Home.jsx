@@ -155,11 +155,11 @@ class Home extends Component {
 	initFirebase() {
 		// Initialize Cloud Firestore through Firebase
 		let db = firebase.firestore();
+
+		// Set settings because warnings
 		let settings = {
 			timestampsInSnapshots: true
 		};
-
-		// Set settings because warnings
 		db.settings(settings);
 
 		return db;
@@ -198,6 +198,7 @@ class Home extends Component {
 		) : (
 			<div className="MapWrapper">
 				<Map
+					apiKey={this.props.apiKey}
 					className="Map"
 					handleMarkerClick={this.handleMarkerClick}
 					infoOpen={this.state.infoOpen}

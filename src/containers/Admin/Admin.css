@@ -1,0 +1,58 @@
+.LoginHeader {
+  margin-bottom: 40px; }
+
+.LoginForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; }
+
+.UtilityWrapper {
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: #333333; }
+  .UtilityWrapper button {
+    margin-bottom: 10px; }
+
+.AdminMapWrapper {
+  display: flex;
+  width: 100%;
+  height: 100%; }
+
+.InnerMapWrapper {
+  width: 0;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; }
+
+.MouseAdd .MapInner * {
+  cursor: crosshair; }
+
+.MapInner {
+  width: 100%;
+  height: 0;
+  flex: 1; }
+
+.InfoMessage {
+  position: absolute;
+  padding: 5px 10px;
+  top: 0;
+  margin: 20px auto;
+  z-index: 200000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+  background-color: white; }
+  .InfoMessage .Spinner {
+    margin: 10px;
+    margin-left: 0; }

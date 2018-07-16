@@ -1,0 +1,34 @@
+@import 'style-extra/variables.scss';
+
+.u-meta {
+    font-size: 1.4rem;
+    font-weight: 900;
+}
+
+.u-flexCenterLeft {
+    display: flex;
+    align-items: center;
+}
+
+.u-flex1 {
+    flex: 1;
+}
+
+.u-inlineBlock {
+    display: inline-block;
+}
+
+.u-textRight {
+    text-align: right;
+}
+
+.u-width100 {
+    width: 100%;
+}
+
+$marginConfig: (smallMargin: $smallMargin, standardMargin: $standardMargin, bigMargin: $bigMargin, doubleMargin: $doubleMargin);
+@each $margin, $marginVar in $marginConfig {
+    .u-#{$margin} {
+        margin-bottom: $marginVar;
+    }
+}

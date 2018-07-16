@@ -60,6 +60,11 @@ h3,
 h4 {
   font-size: inherit; }
 
+input, textarea, select, option {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 400; }
+
 strong {
   font-weight: bold; }
 

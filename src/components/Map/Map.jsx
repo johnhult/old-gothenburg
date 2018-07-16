@@ -242,7 +242,7 @@ class Map extends Component {
 			<div className="InnerMap">
 				<GoogleMapReact
 					bootstrapURLKeys={{
-						key: ''
+						key: this.props.apiKey
 					}}
 					defaultCenter={MAP.defaultCenter}
 					defaultZoom={MAP.defaultZoom}

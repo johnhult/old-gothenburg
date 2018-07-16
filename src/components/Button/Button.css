@@ -4,10 +4,48 @@
   background-color: white;
   border-radius: 200px;
   transition: .2s;
-  font-size: 900;
+  font-weight: 900;
   color: #58bfbf;
   color: #6b02ce;
   user-select: none;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3); }
-  .btn:hover {
+  .btn:hover, .btn:focus {
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3); }
+
+button:disabled {
+  background-color: #cccccc;
+  color: white; }
+
+.DangerButton {
+  background-color: #f85050;
+  color: white; }
+
+.IconButton {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: initial;
+  background-color: white; }
+  .IconButton * {
+    fill: #7dcdcd; }
+
+.IconButton:hover {
+  background-color: #7dcdcd; }
+  .IconButton:hover * {
+    fill: white; }
+
+.IconButton--active {
+  background-color: #7dcdcd; }
+  .IconButton--active * {
+    fill: white; }
+
+.IconWrapper {
+  pointer-events: none;
+  width: 20px;
+  height: 20px; }
+  .IconWrapper div {
+    width: 100%;
+    height: 100%; }
