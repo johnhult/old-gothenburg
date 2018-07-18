@@ -13,7 +13,16 @@ class Spinner extends Component {
 		return (
 			<div
 				className="Spinner"
-				style={{ height: this.props.size, width: this.props.size }}
+				style={{
+					display: this.props.display,
+					height: this.props.size,
+					margin: `${
+						typeof this.props.margins === 'string'
+							? this.props.margins
+							: this.props.margins + 'px'
+					}`,
+					width: this.props.size
+				}}
 			/>
 		);
 	}
@@ -22,10 +31,13 @@ class Spinner extends Component {
 Spinner.defaultProps = {
 	//	Example defaultProps
 	//	label: 'click me'
+	margins: '20px auto',
 	size: 50
 };
 
 Spinner.PropTypes = {
+	display: PropTypes.string,
+	margins: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 	size: PropTypes.number
 	//	Example PropTypes:
 	//	label: PropTypes.string.isRequired,

@@ -16,7 +16,10 @@ class Button extends Component {
 				disabled={this.props.disabled}
 				className={`btn ${this.props.className || ''} ${
 					this.props.type === 'icon' ? 'IconButton' : ''
-				} ${this.props.type === 'dismissive' ? 'DangerButton' : ''}`}
+				} ${this.props.type === 'dismissive' ? 'DangerButton' : ''} ${
+					this.props.iconType === 'dark' ? 'IconButton--dark' : ''
+				}`}
+				style={{ margin: this.props.margins }}
 				onClick={this.props.handleClick}
 				type={this.props.type}
 			>
@@ -40,6 +43,7 @@ Button.PropTypes = {
 	className: PropTypes.string,
 	disabled: PropTypes.bool,
 	handleClick: PropTypes.func.isRequired,
+	iconType: PropTypes.string,
 	imgPath: PropTypes.string,
 	label: PropTypes.string,
 	type: PropTypes.string

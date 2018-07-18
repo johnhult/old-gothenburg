@@ -1,28 +1,5 @@
 @import 'style-extra/variables.scss';
 
-.LoginHeader {
-	margin-bottom: 40px;
-}
-
-.LoginForm {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-}
-
-.UtilityWrapper {
-	height: 100%;
-	padding: 10px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: flex-start;
-	background-color: $ultraDarkGrey;
-	button {
-		margin-bottom: 10px;
-	}
-}
 .AdminMapWrapper {
 	display: flex;
 	width: 100%;
@@ -46,6 +23,13 @@
 		}
 	}
 }
+.MouseRemove {
+	.MapInner {
+		* {
+			cursor: not-allowed;
+		}
+	}
+}
 .MapInner {
 	width: 100%;
 	height: 0;
@@ -62,8 +46,4 @@
 	justify-content: center;
 	box-shadow: 0px 3px 6px rgba(black, 0.3);
 	background-color: white;
-	.Spinner {
-		margin: 10px;
-		margin-left: 0;
-	}
 }

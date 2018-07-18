@@ -1,0 +1,180 @@
+[
+	{
+		"featureType": "landscape.natural",
+		"elementType": "geometry.fill",
+		"stylers": [
+			{
+				"visibility": "hidden"
+			},
+			{
+				"color": "#e0efef"
+			}
+		]
+	},
+	{
+		"featureType": "poi",
+		"stylers": [
+			{
+				"visibility": "on"
+			}
+		]
+	},
+	{
+		"featureType": "poi",
+		"elementType": "labels.text",
+		"stylers": [
+			{
+				"visibility": "on"
+			}
+		]
+	},
+	{
+		"featureType": "poi",
+		"elementType": "labels.text.fill",
+		"stylers": [
+			{
+				"color": "#9f795f"
+			},
+			{
+				"visibility": "on"
+			}
+		]
+	},
+	{
+		"featureType": "poi",
+		"elementType": "labels.icon",
+		"stylers": [
+			{
+				"hue": "#ff6800"
+			},
+			{
+				"visibility": "on"
+			},
+			{
+				"saturation": "-60"
+			}
+		]
+	},
+	{
+		"featureType": "poi.attraction",
+		"elementType": "geometry.fill",
+		"stylers": [
+			{
+				"visibility": "on"
+			},
+			{
+				"hue": "#1900ff"
+			},
+			{
+				"color": "#c0e8e8"
+			}
+		]
+	},
+	{
+		"featureType": "poi.business",
+		"stylers": [
+			{
+				"visibility": "off"
+			}
+		]
+	},
+	{
+		"featureType": "poi.government",
+		"stylers": [
+			{
+				"visibility": "off"
+			}
+		]
+	},
+	{
+		"featureType": "poi.medical",
+		"stylers": [
+			{
+				"visibility": "off"
+			}
+		]
+	},
+	{
+		"featureType": "poi.park",
+		"stylers": [
+			{
+				"visibility": "on"
+			},
+			{
+				"hue": "#1900ff"
+			},
+			{
+				"color": "#c0e8e8"
+			}
+		]
+	},
+	{
+		"featureType": "poi.place_of_worship",
+		"elementType": "all",
+		"stylers": [
+			{
+				"visibility": "off"
+			}
+		]
+	},
+	{
+		"featureType": "poi.school",
+		"elementType": "all",
+		"stylers": [
+			{
+				"visibility": "off"
+			}
+		]
+	},
+	{
+		"featureType": "poi.sports_complex",
+		"elementType": "all",
+		"stylers": [
+			{
+				"visibility": "off"
+			}
+		]
+	},
+	{
+		"featureType": "road",
+		"elementType": "geometry",
+		"stylers": [
+			{
+				"lightness": 100
+			},
+			{
+				"visibility": "simplified"
+			}
+		]
+	},
+	{
+		"featureType": "road",
+		"elementType": "labels",
+		"stylers": [
+			{
+				"visibility": "on"
+			}
+		]
+	},
+	{
+		"featureType": "transit.line",
+		"elementType": "geometry",
+		"stylers": [
+			{
+				"visibility": "on"
+			},
+			{
+				"lightness": 700
+			}
+		]
+	},
+	{
+		"featureType": "water",
+		"elementType": "all",
+		"stylers": [
+			{
+				"color": "#7dcdcd"
+			}
+		]
+	}
+]

@@ -6,15 +6,14 @@ import 'firebase/firestore';
 import 'firebase/storage';
 import 'firebase/auth';
 
-import AdminInput from 'components/AdminInput/AdminInput.jsx';
 import AdminPointEdit from 'containers/AdminPointEdit/AdminPointEdit.jsx';
-import Button from 'components/Button/Button.jsx';
+import AdminUtility from 'components/AdminUtility/AdminUtility.jsx';
 import Marker from 'components/Marker/Marker.jsx';
+import Overlay from 'components/Overlay/Overlay.jsx';
 import Spinner from 'components/Spinner/Spinner.jsx';
 
-import AddMarker from 'img/icons/add-marker.svg';
-import Logout from 'img/icons/logout.svg';
-import MapStyle from 'data/MAP-STYLE.json';
+import Login from 'components/Login/Login.jsx';
+import MapStyle from 'data/ADMIN-STYLE.json';
 import './Admin.css';
 
 const MAP = {
@@ -45,6 +44,7 @@ class Admin extends React.Component {
 		super(props);
 		this.state = {
 			addNewPoint: false,
+			editPoint: false,
 			email: '',
 			error: null,
 			isSignedIn: false,
@@ -55,7 +55,12 @@ class Admin extends React.Component {
 			pointToEdit: {
 				lat: null,
 				lng: null
-			}
+			},
+			removeLoading: false,
+			removeMarker: null,
+			removeMarkerInfo: null,
+			removePoint: false,
+			showRemove: false
 		};
 		this.db = null;
 		this.map = null;
@@ -64,23 +69,9 @@ class Admin extends React.Component {
 		this.storage = null;
 	}
 
-	login = event => {
-		event.preventDefault();
-		firebase
-			.auth()
-			.signInWithEmailAndPassword(this.state.email, this.state.password)
-			.catch(error => {
-				// Handle Errors here.
-				this.setState({
-					error: error.message
-				});
-			});
-	};
-
-	handleChange = event => {
-		let name = event.target.name;
+	onLogin = user => {
 		this.setState({
-			[name]: event.target.value
+			isSignedIn: !!user
 		});
 	};
 
@@ -90,6 +81,7 @@ class Admin extends React.Component {
 		this.maps.event.addListener(map, 'click', event => {
 			this.addPoint(event.latLng);
 		});
+		this.getMarkers(this.initFirebase());
 	};
 
 	initFirebase() {
@@ -107,22 +99,28 @@ class Admin extends React.Component {
 		return this.db;
 	}
 
-	getMarkers(db) {
+	getMarkers = db => {
+		let database = db || this.db;
 		this.setState({ loadingMarkers: true });
 		// Get marker data
-		db.collection('markers')
+		database
+			.collection('markers')
 			.get()
 			.then(
 				querySnapshot => {
 					let markers = [];
 					querySnapshot.forEach(doc => {
-						let marker = { ...doc.data(), id: doc.id };
+						let marker = {
+							...doc.data(),
+							id: doc.id,
+							selfReference: doc.ref
+						};
 						markers.push(marker);
 					});
 					this.setState(
 						{ loadingMarkers: false, markers: markers },
 						() => {
-							// this.setBounds();
+							this.setBounds();
 						}
 					);
 				},
@@ -133,13 +131,13 @@ class Admin extends React.Component {
 					});
 				}
 			);
-	}
+	};
 
 	getMessage = () => {
 		if (this.state.loadingMarkers) {
 			return (
 				<div className="InfoMessage">
-					<Spinner size={30} />
+					<Spinner size={30} margins="10px 10px 10px 0" />
 					<span>Loading markers</span>
 				</div>
 			);
@@ -199,8 +197,23 @@ class Admin extends React.Component {
 		this.map.fitBounds(fitBounds);
 	};
 
+	toggleActiveNewPoint = () => {
+		if (this.state.newPointOpen) {
+			return;
+		}
+		this.setState({
+			addNewPoint: !this.state.addNewPoint
+		});
+	};
+
+	toggleActiveRemovePoint = () => {
+		this.setState({
+			removePoint: !this.state.removePoint
+		});
+	};
+
 	addPoint = latLng => {
-		if (!this.state.addNewPoint) {
+		if (!this.state.addNewPoint || this.state.newPointOpen) {
 			return;
 		}
 		this.map.panTo(latLng);
@@ -222,6 +235,77 @@ class Admin extends React.Component {
 		);
 	};
 
+	removePoint = () => {
+		this.setState({
+			removeLoading: true
+		});
+		let audioRef = firebase
+			.storage()
+			.refFromURL(this.state.removeMarkerInfo.audioPath);
+		let markerInfoRef = this.state.removeMarker.markerInfo;
+		let markerRef = this.state.removeMarker.selfReference;
+		// let markerRef = firebase.firestore.CollectionReference().where(, '==', this.state.removeMarker.id);
+		// console.log(audioRef, markerInfoRef, markerRef);
+		audioRef.delete().then(
+			() => {
+				markerInfoRef.delete().then(
+					() => {
+						markerRef.delete().then(
+							() => {
+								this.setState({
+									removeLoading: false
+								});
+								this.closeRemove();
+								this.getMarkers();
+							},
+							error => {
+								this.setState({
+									error: error
+								});
+							}
+						);
+					},
+					error => {
+						this.setState({
+							error: error
+						});
+					}
+				);
+			},
+			error => {
+				this.setState({
+					error: error
+				});
+			}
+		);
+	};
+
+	handleChildClick = clickedMarkerId => {
+		if (!this.state.removePoint && !this.state.editPoint) {
+			return;
+		}
+		if (this.state.removePoint) {
+			this.setState({
+				showRemove: true
+			});
+			let marker = this.state.markers.find(
+				correctMarker => correctMarker.id === clickedMarkerId
+			);
+			marker.markerInfo.get().then(
+				querySnapshot => {
+					let data = querySnapshot.data();
+					this.setState({
+						removeMarker: marker,
+						removeMarkerInfo: data
+					});
+				},
+				error => {
+					this.setState({ error: error });
+				}
+			);
+		}
+	};
+
 	closeNewPoint = () => {
 		this.newMarker.setMap(null);
 		this.setState({
@@ -230,13 +314,16 @@ class Admin extends React.Component {
 		});
 	};
 
+	closeRemove = () => {
+		this.setState({
+			removeMarker: null,
+			removeMarkerInfo: null,
+			removePoint: false,
+			showRemove: false
+		});
+	};
+
 	componentDidUpdate = (prevProps, prevState) => {
-		if (
-			this.state.isSignedIn &&
-			prevState.isSignedIn !== this.state.isSignedIn
-		) {
-			this.getMarkers(this.initFirebase());
-		}
 		if (
 			!this.state.newPointOpen &&
 			this.state.newPointOpen !== prevState.newPointOpen
@@ -246,14 +333,14 @@ class Admin extends React.Component {
 	};
 
 	// Listen to the Firebase Auth state and set the local state.
-	componentDidMount() {
+	componentWillMount = () => {
 		this.unregisterAuthObserver = firebase
 			.auth()
 			.onAuthStateChanged(user => this.setState({ isSignedIn: !!user }));
-	}
+	};
 
-	// Make sure we un-register Firebase observers when the component unmounts.
 	componentWillUnmount() {
+		// Make sure we un-register Firebase observers when the component unmounts.
 		this.unregisterAuthObserver();
 		if (this.maps) {
 			this.maps.event.clearListeners(this.map, 'clicked');
@@ -262,59 +349,46 @@ class Admin extends React.Component {
 
 	render() {
 		if (!this.state.isSignedIn) {
-			return (
-				<div>
-					<h1 className="LoginHeader">Old Gothenburg</h1>
-					<form className="LoginForm" onSubmit={this.login}>
-						<AdminInput
-							name="email"
-							type="email"
-							label="Email"
-							handleChange={this.handleChange}
-							value={this.state.email}
-							showError={false}
-						/>
-						<AdminInput
-							name="password"
-							type="password"
-							label="Password"
-							handleChange={this.handleChange}
-							value={this.state.password}
-							showError={false}
-						/>
-						<Button label="Log In" type="submit" />
-					</form>
-					{this.state.error ? <h1>{this.state.error}</h1> : null}
-				</div>
-			);
+			return <Login />;
 		}
 		return (
 			<div className="AdminMapWrapper">
-				<div className="UtilityWrapper">
-					<Button
-						handleClick={() => firebase.auth().signOut()}
-						type="icon"
-						imgPath={Logout}
+				{this.state.showRemove ? (
+					<Overlay
+						header={`Remove point${
+							this.state.removeMarkerInfo
+								? ' ' + this.state.removeMarkerInfo.header
+								: ''
+						}?`}
+						loading={!this.state.removeMarkerInfo}
+						removeLoading={this.state.removeLoading}
+						text="This action will permanently remove this marker and all it's nested data such as audiofiles and text information. Please think this though. Seriously my dude/dudette. It's going to be gone forever. What you wanna do?"
+						buttons={[
+							{
+								action: this.closeRemove,
+								label: 'Oh no, cancel this action'
+							},
+							{
+								action: this.removePoint,
+								disabled: !this.state.removeMarkerInfo,
+								label: 'Delete the shit outta that marker',
+								type: 'dismissive'
+							}
+						]}
 					/>
-					<Button
-						className={`${
-							this.state.addNewPoint ? 'IconButton--active' : ''
-						}`}
-						handleClick={() =>
-							this.setState({
-								addNewPoint: !this.state.addNewPoint
-							})
-						}
-						type="icon"
-						imgPath={AddMarker}
-					/>
-				</div>
+				) : null}
+				<AdminUtility
+					addNewPoint={this.state.addNewPoint}
+					removePoint={this.state.removePoint}
+					toggleActiveNewPoint={this.toggleActiveNewPoint}
+					toggleActiveRemovePoint={this.toggleActiveRemovePoint}
+				/>
 				<div
 					className={`InnerMapWrapper ${
 						this.state.addNewPoint && !this.state.newPointOpen
 							? 'MouseAdd'
 							: ''
-					}`}
+					} ${this.state.removePoint ? 'MouseRemove' : ''}`}
 				>
 					{this.getMessage()}
 					<div className="MapInner">
@@ -346,6 +420,7 @@ class Admin extends React.Component {
 					</div>
 					<AdminPointEdit
 						closeNewPoint={this.closeNewPoint}
+						onAdded={this.getMarkers}
 						db={this.db}
 						firebase={this.firebase}
 						newPointOpen={this.state.newPointOpen}

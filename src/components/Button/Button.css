@@ -1,6 +1,6 @@
 .btn {
   padding: 5px 20px;
-  max-width: 90%;
+  max-width: 100%;
   background-color: white;
   border-radius: 200px;
   transition: .2s;
@@ -9,7 +9,7 @@
   color: #6b02ce;
   user-select: none;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3); }
-  .btn:hover, .btn:focus {
+  .btn:not(.IconButton--dark):not(.IconButton--active):hover, .btn:not(.IconButton--dark):not(.IconButton--active):focus {
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3); }
 
 button:disabled {
@@ -27,20 +27,34 @@ button:disabled {
   align-items: center;
   justify-content: center;
   padding: 0;
-  box-shadow: initial;
+  box-shadow: none;
   background-color: white; }
-  .IconButton * {
+  .IconButton path, .IconButton polygon, .IconButton circle, .IconButton rect {
+    transition: 0.2s;
     fill: #7dcdcd; }
 
 .IconButton:hover {
   background-color: #7dcdcd; }
-  .IconButton:hover * {
+  .IconButton:hover path, .IconButton:hover polygon, .IconButton:hover circle, .IconButton:hover rect {
     fill: white; }
 
-.IconButton--active {
-  background-color: #7dcdcd; }
-  .IconButton--active * {
+.IconButton--dark {
+  background-color: transparent;
+  box-shadow: none; }
+  .IconButton--dark path, .IconButton--dark polygon, .IconButton--dark circle, .IconButton--dark rect {
     fill: white; }
+
+.IconButton--dark:hover {
+  background-color: transparent;
+  box-shadow: none; }
+  .IconButton--dark:hover path, .IconButton--dark:hover polygon, .IconButton--dark:hover circle, .IconButton--dark:hover rect {
+    fill: #7dcdcd; }
+
+.IconButton--active {
+  background-color: transparent;
+  border: 1px solid #7dcdcd; }
+  .IconButton--active path, .IconButton--active polygon, .IconButton--active circle, .IconButton--active rect {
+    fill: #7dcdcd; }
 
 .IconWrapper {
   pointer-events: none;

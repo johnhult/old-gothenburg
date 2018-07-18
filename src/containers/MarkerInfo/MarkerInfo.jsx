@@ -22,7 +22,15 @@ class MarkerInfo extends Component {
 					infoOpen={this.props.infoOpen}
 					audioPath={this.props.markerInfo.audioPath}
 				/>
-				<p>{this.props.markerInfo.text}</p>
+				{this.props.markerInfo.text
+					.split('\\n\\n')
+					.map((text, index) => {
+						return (
+							<p className="u-bigMargin" key={index}>
+								{text}
+							</p>
+						);
+					})}
 			</div>
 		) : (
 			<div className="MarkerText">

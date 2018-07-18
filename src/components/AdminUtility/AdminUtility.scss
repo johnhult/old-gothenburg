@@ -1,0 +1,15 @@
+@import 'style-extra/variables.scss';
+
+.UtilityWrapper {
+	height: 100%;
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	background-color: $ultraDarkGrey;
+	button {
+		flex-shrink: 0;
+		margin-bottom: 10px;
+	}
+}

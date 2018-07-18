@@ -1,6 +1,5 @@
 .Spinner {
   border-radius: 500px;
-  margin: 20px auto;
   border: 1px solid #7dcdcd;
   border-bottom-color: transparent;
   animation: rotate 1s linear infinite; }
