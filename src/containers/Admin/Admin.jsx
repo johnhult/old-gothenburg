@@ -43,23 +43,21 @@ class Admin extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			addNewPoint: false,
-			editPoint: false,
+			activeButton: '',
 			email: '',
 			error: null,
 			isSignedIn: false,
+			loadedMarker: null,
+			loadedMarkerInfo: null,
 			loadingMarkers: false,
 			markers: [],
-			newPointOpen: false,
 			password: '',
 			pointToEdit: {
 				lat: null,
 				lng: null
 			},
 			removeLoading: false,
-			removeMarker: null,
-			removeMarkerInfo: null,
-			removePoint: false,
+			showEdit: false,
 			showRemove: false
 		};
 		this.db = null;
@@ -152,7 +150,7 @@ class Admin extends React.Component {
 	};
 
 	setMapOptions = () => {
-		let options = this.state.newPointOpen
+		let options = this.state.showEdit
 			? {
 				draggable: false,
 				maxZoom: this.map.getZoom(),
@@ -197,23 +195,62 @@ class Admin extends React.Component {
 		this.map.fitBounds(fitBounds);
 	};
 
-	toggleActiveNewPoint = () => {
-		if (this.state.newPointOpen) {
+	toggleActiveButton = buttonToToggle => {
+		if (this.state.showEdit) {
 			return;
 		}
 		this.setState({
-			addNewPoint: !this.state.addNewPoint
+			activeButton:
+				buttonToToggle !== this.state.activeButton ? buttonToToggle : ''
 		});
 	};
 
-	toggleActiveRemovePoint = () => {
+	getMarkerInfo = clickedMarkerId => {
+		if (this.state.activeButton === 'remove') {
+			this.setState({
+				showRemove: true
+			});
+		}
+		let marker = this.state.markers.find(
+			correctMarker => correctMarker.id === clickedMarkerId
+		);
 		this.setState({
-			removePoint: !this.state.removePoint
+			loadedMarker: marker
 		});
+		if (this.state.activeButton === 'edit') {
+			this.map.panTo({
+				lat: marker.geo.latitude,
+				lng: marker.geo.longitude
+			});
+			this.setState(
+				{
+					loadedMarker: marker,
+					pointToEdit: {
+						lat: marker.geo.latitude,
+						lng: marker.geo.longitude
+					},
+					showEdit: true
+				},
+				() => {
+					this.setMapOptions();
+				}
+			);
+		}
+		marker.markerInfo.get().then(
+			querySnapshot => {
+				let data = querySnapshot.data();
+				this.setState({
+					loadedMarkerInfo: data
+				});
+			},
+			error => {
+				this.setState({ error: error });
+			}
+		);
 	};
 
 	addPoint = latLng => {
-		if (!this.state.addNewPoint || this.state.newPointOpen) {
+		if (this.state.activeButton !== 'add' || this.state.showEdit) {
 			return;
 		}
 		this.map.panTo(latLng);
@@ -223,11 +260,11 @@ class Admin extends React.Component {
 		});
 		this.setState(
 			{
-				newPointOpen: true,
 				pointToEdit: {
 					lat: latLng.lat(),
 					lng: latLng.lng()
-				}
+				},
+				showEdit: true
 			},
 			() => {
 				this.setMapOptions();
@@ -235,17 +272,15 @@ class Admin extends React.Component {
 		);
 	};
 
-	removePoint = () => {
+	deleteMarker = () => {
 		this.setState({
 			removeLoading: true
 		});
 		let audioRef = firebase
 			.storage()
-			.refFromURL(this.state.removeMarkerInfo.audioPath);
-		let markerInfoRef = this.state.removeMarker.markerInfo;
-		let markerRef = this.state.removeMarker.selfReference;
-		// let markerRef = firebase.firestore.CollectionReference().where(, '==', this.state.removeMarker.id);
-		// console.log(audioRef, markerInfoRef, markerRef);
+			.refFromURL(this.state.loadedMarkerInfo.audioPath);
+		let markerInfoRef = this.state.loadedMarker.markerInfo;
+		let markerRef = this.state.loadedMarker.selfReference;
 		audioRef.delete().then(
 			() => {
 				markerInfoRef.delete().then(
@@ -281,52 +316,46 @@ class Admin extends React.Component {
 	};
 
 	handleChildClick = clickedMarkerId => {
-		if (!this.state.removePoint && !this.state.editPoint) {
+		if (
+			(this.state.activeButton !== 'remove' &&
+				this.state.activeButton !== 'edit') ||
+			this.state.showEdit
+		) {
 			return;
 		}
-		if (this.state.removePoint) {
-			this.setState({
-				showRemove: true
-			});
-			let marker = this.state.markers.find(
-				correctMarker => correctMarker.id === clickedMarkerId
-			);
-			marker.markerInfo.get().then(
-				querySnapshot => {
-					let data = querySnapshot.data();
-					this.setState({
-						removeMarker: marker,
-						removeMarkerInfo: data
-					});
-				},
-				error => {
-					this.setState({ error: error });
-				}
-			);
+		if (
+			this.state.activeButton === 'remove' ||
+			this.state.activeButton === 'edit'
+		) {
+			this.getMarkerInfo(clickedMarkerId);
 		}
 	};
 
-	closeNewPoint = () => {
-		this.newMarker.setMap(null);
+	closeEdit = () => {
+		if (this.state.activeButton === 'add') {
+			this.newMarker.setMap(null);
+		}
 		this.setState({
-			addNewPoint: false,
-			newPointOpen: false
+			activeButton: '',
+			loadedMarker: null,
+			loadedMarkerInfo: null,
+			showEdit: false
 		});
 	};
 
 	closeRemove = () => {
 		this.setState({
-			removeMarker: null,
-			removeMarkerInfo: null,
-			removePoint: false,
+			activeButton: '',
+			loadedMarker: null,
+			loadedMarkerInfo: null,
 			showRemove: false
 		});
 	};
 
 	componentDidUpdate = (prevProps, prevState) => {
 		if (
-			!this.state.newPointOpen &&
-			this.state.newPointOpen !== prevState.newPointOpen
+			!this.state.showEdit &&
+			this.state.showEdit !== prevState.showEdit
 		) {
 			this.setMapOptions();
 		}
@@ -356,11 +385,11 @@ class Admin extends React.Component {
 				{this.state.showRemove ? (
 					<Overlay
 						header={`Remove point${
-							this.state.removeMarkerInfo
-								? ' ' + this.state.removeMarkerInfo.header
+							this.state.loadedMarkerInfo
+								? ' ' + this.state.loadedMarkerInfo.header
 								: ''
 						}?`}
-						loading={!this.state.removeMarkerInfo}
+						loading={!this.state.loadedMarkerInfo}
 						removeLoading={this.state.removeLoading}
 						text="This action will permanently remove this marker and all it's nested data such as audiofiles and text information. Please think this though. Seriously my dude/dudette. It's going to be gone forever. What you wanna do?"
 						buttons={[
@@ -369,8 +398,10 @@ class Admin extends React.Component {
 								label: 'Oh no, cancel this action'
 							},
 							{
-								action: this.removePoint,
-								disabled: !this.state.removeMarkerInfo,
+								action: this.deleteMarker,
+								disabled:
+									!this.state.loadedMarkerInfo ||
+									!this.state.loadedMarker,
 								label: 'Delete the shit outta that marker',
 								type: 'dismissive'
 							}
@@ -378,17 +409,25 @@ class Admin extends React.Component {
 					/>
 				) : null}
 				<AdminUtility
-					addNewPoint={this.state.addNewPoint}
-					removePoint={this.state.removePoint}
-					toggleActiveNewPoint={this.toggleActiveNewPoint}
-					toggleActiveRemovePoint={this.toggleActiveRemovePoint}
+					activeButton={this.state.activeButton}
+					toggleActiveButton={this.toggleActiveButton}
 				/>
 				<div
 					className={`InnerMapWrapper ${
-						this.state.addNewPoint && !this.state.newPointOpen
+						this.state.activeButton === 'add' &&
+						!this.state.showEdit
 							? 'MouseAdd'
 							: ''
-					} ${this.state.removePoint ? 'MouseRemove' : ''}`}
+					} ${
+						this.state.activeButton === 'edit' &&
+						!this.state.showEdit
+							? 'MouseEdit'
+							: ''
+					} ${
+						this.state.activeButton === 'remove'
+							? 'MouseRemove'
+							: ''
+					}`}
 				>
 					{this.getMessage()}
 					<div className="MapInner">
@@ -419,12 +458,14 @@ class Admin extends React.Component {
 						</GoogleMapReact>
 					</div>
 					<AdminPointEdit
-						closeNewPoint={this.closeNewPoint}
+						closeEdit={this.closeEdit}
 						onAdded={this.getMarkers}
 						db={this.db}
+						editMode={this.state.activeButton}
 						firebase={this.firebase}
-						newPointOpen={this.state.newPointOpen}
-						marker={this.state.markerSelected || null}
+						showEdit={this.state.showEdit}
+						marker={this.state.loadedMarker}
+						markerInfo={this.state.loadedMarkerInfo}
 						storage={this.storage}
 						point={this.state.pointToEdit}
 					/>

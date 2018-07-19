@@ -15,7 +15,8 @@
   justify-content: center;
   color: white;
   text-align: center;
-  background-color: #7dcdcd; }
+  background-color: #7dcdcd;
+  overflow: hidden; }
 
 .FileText {
   width: 100%;
@@ -23,7 +24,11 @@
   line-height: 30px;
   border: 0;
   display: block;
-  font-weight: 900; }
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 0 5px;
+  text-overflow: ellipsis; }
 
 .LabelTextarea {
   width: 400px;

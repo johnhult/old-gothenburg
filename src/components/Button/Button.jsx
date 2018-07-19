@@ -18,6 +18,10 @@ class Button extends Component {
 					this.props.type === 'icon' ? 'IconButton' : ''
 				} ${this.props.type === 'dismissive' ? 'DangerButton' : ''} ${
 					this.props.iconType === 'dark' ? 'IconButton--dark' : ''
+				} ${
+					this.props.active && this.props.type === 'icon'
+						? 'IconButton--active'
+						: ''
 				}`}
 				style={{ margin: this.props.margins }}
 				onClick={this.props.handleClick}
@@ -40,6 +44,7 @@ class Button extends Component {
 Button.defaultProps = {};
 
 Button.PropTypes = {
+	active: PropTypes.bool,
 	className: PropTypes.string,
 	disabled: PropTypes.bool,
 	handleClick: PropTypes.func.isRequired,

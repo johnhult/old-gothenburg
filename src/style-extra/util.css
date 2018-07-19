@@ -4,7 +4,20 @@
 
 .u-flexCenterLeft {
   display: flex;
-  align-items: center; }
+  align-items: center;
+  justify-content: flex-start; }
+
+.u-flexRowCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row; }
+
+.u-flexColumnCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column; }
 
 .u-flex1 {
   flex: 1; }
@@ -14,6 +27,9 @@
 
 .u-textRight {
   text-align: right; }
+
+.u-fatText {
+  font-weight: 900; }
 
 .u-width100 {
   width: 100%; }

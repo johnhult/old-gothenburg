@@ -23,6 +23,13 @@
 		}
 	}
 }
+.MouseEdit {
+	.MapInner {
+		* {
+			cursor: crosshair;
+		}
+	}
+}
 .MouseRemove {
 	.MapInner {
 		* {

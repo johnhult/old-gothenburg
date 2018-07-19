@@ -17,6 +17,9 @@
 .MouseAdd .MapInner * {
   cursor: crosshair; }
 
+.MouseEdit .MapInner * {
+  cursor: crosshair; }
+
 .MouseRemove .MapInner * {
   cursor: not-allowed; }
 

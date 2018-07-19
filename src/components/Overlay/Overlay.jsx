@@ -32,11 +32,15 @@ class Overlay extends Component {
 		let header;
 		let headerText = this.props.header.split(/(?=[?])/g);
 		if (!this.props.loading || headerText.length <= 1) {
-			header = <h2 className="u-standardMargin">{this.props.header}</h2>;
+			header = (
+				<h2 className="u-standardMargin u-fatText">
+					{this.props.header}
+				</h2>
+			);
 		}
 		else {
 			header = (
-				<h2 className="u-standardMargin">
+				<h2 className="u-standardMargin u-fatText">
 					{headerText[0]}
 					<Spinner size={20} display="inline-block" margins="0 5px" />
 					{headerText[1]}
