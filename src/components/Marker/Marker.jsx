@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
 import ReactSVG from 'react-svg';
 
+import buildingMarker from 'img/icons/marker-building.svg';
 import cultureMarker from 'img/icons/marker-culture.svg';
+import infoMarker from 'img/icons/marker-information.svg';
 import userMarker from 'img/icons/marker-user.svg';
 import './Marker.css';
 
 const paths = {
+	building: buildingMarker,
 	culture: cultureMarker,
+	information: infoMarker,
 	user: userMarker
 };
 
@@ -28,11 +32,12 @@ class Marker extends Component {
 				width: '20px'
 			  }
 			: {
-				height: '30px',
-				left: '-15px',
+				cursor: 'pointer',
+				height: '40px',
+				left: '-20px',
 				position: 'relative',
 				top: '-30px',
-				width: '30px'
+				width: '40px'
 			  };
 	};
 

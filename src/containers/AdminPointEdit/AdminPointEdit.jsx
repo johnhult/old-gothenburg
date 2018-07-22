@@ -99,17 +99,17 @@ class AdminPointEdit extends Component {
 			this.handleAddNew(firebase, storageRef, db);
 		}
 		else if (this.props.editMode === 'edit') {
-			this.handleEdit(firebase, storageRef, db);
+			this.handleEdit(firebase, storageRef);
 		}
 	};
 
-	handleEdit = (firebase, storageRef, db) => {
+	handleEdit = (firebase, storageRef) => {
 		if (this.state.valuesChanged.length <= 0) {
 			return;
 		}
 		let headerChanged = this.state.valuesChanged.indexOf('header') >= 0;
 		let textChanged = this.state.valuesChanged.indexOf('text') >= 0;
-		let typeChanged = this.state.valuesChanged.indexOf('type') >= 0;
+		let typeChanged = this.state.valuesChanged.indexOf('markerType') >= 0;
 		let audioChanged = this.state.valuesChanged.indexOf('audio') >= 0;
 		let marker = this.props.marker.selfReference;
 		let markerInfo = this.props.marker.markerInfo;
@@ -119,7 +119,7 @@ class AdminPointEdit extends Component {
 			...(headerChanged && { header: this.state.values.header })
 		};
 		let updatedMarker = {
-			...(typeChanged && { type: this.state.values.type })
+			...(typeChanged && { type: this.state.values.markerType })
 		};
 		if (audioChanged) {
 			// Get audio ref for current audio path
@@ -170,6 +170,7 @@ class AdminPointEdit extends Component {
 			);
 		}
 		else {
+			console.log(typeChanged, marker, updatedMarker);
 			let updateTask = [
 				markerInfo.update(updatedMarkerInfo),
 				...(typeChanged ? marker.update(updatedMarker) : [])

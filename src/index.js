@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {
 	BrowserRouter as Router,
+	Redirect,
 	Route,
 	Switch,
 	browserHistory
@@ -46,6 +47,7 @@ const Main = () => (
 				path="/addNewPoints"
 				component={() => <Admin apiKey={gMapsApi} />}
 			/>
+			<Route path="/*" component={() => <Redirect to="/" />} />
 		</Switch>
 	</main>
 );

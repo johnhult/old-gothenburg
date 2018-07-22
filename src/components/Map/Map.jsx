@@ -20,7 +20,7 @@ const MAP = {
 		draggable: true,
 		fullscreenControl: false,
 		maxZoom: 19,
-		minZoom: 8,
+		minZoom: 4,
 		panControl: true,
 		scrollwheel: true,
 		styles: MapStyle,
@@ -64,7 +64,7 @@ class Map extends Component {
 		});
 		const clusters = supercluster(markers, {
 			maxZoom: 16,
-			minZoom: 2,
+			minZoom: 4,
 			radius: 60
 		});
 
