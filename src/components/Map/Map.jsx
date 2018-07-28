@@ -277,7 +277,7 @@ class Map extends Component {
 							/>
 						);
 					})}
-					{this.props.userPos ? (
+					{this.props.userPos && !this.props.userError ? (
 						<Marker
 							className="User"
 							key="user"
@@ -287,13 +287,19 @@ class Map extends Component {
 						/>
 					) : null}
 				</GoogleMapReact>
-				{!this.props.infoOpen || !this.props.userPos ? (
+				{this.props.infoOpen ||
+				!this.props.userPos ||
+				this.props.userError ? null : (
 					<Button
 						className="UserPositionButton"
-						label="My position"
+						label={
+							this.props.language === 'sv'
+								? 'Min position'
+								: 'My position'
+						}
 						handleClick={e => this.centerOnUser(e)}
 					/>
-				) : null}
+				)}
 			</div>
 		);
 	}
@@ -302,10 +308,13 @@ class Map extends Component {
 Map.defaultProps = {};
 
 Map.propTypes = {
+	apiKey: PropTypes.string,
 	className: PropTypes.string,
 	handleMarkerClick: PropTypes.func.isRequired,
 	infoOpen: PropTypes.bool.isRequired,
+	language: PropTypes.string,
 	markers: PropTypes.array,
+	userError: PropTypes.string,
 	userPos: PropTypes.object
 };
 

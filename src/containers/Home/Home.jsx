@@ -32,10 +32,7 @@ class Home extends Component {
 			shouldShowTutorial: true,
 			tutorialDone: false,
 			userError: null,
-			userPos: {
-				lat: 0,
-				lng: 0
-			}
+			userPos: null
 		};
 		this.openMarker = null;
 	}
@@ -225,7 +222,7 @@ class Home extends Component {
 			}
 
 			// TODO: Remove when done with tutorial
-			now.setMonth(now.getMonth() - 3);
+			// now.setMonth(now.getMonth() - 3);
 			localStorage.setItem('lastVisited', now);
 		}
 		else {
@@ -273,6 +270,7 @@ class Home extends Component {
 					className="Map"
 					handleMarkerClick={this.handleMarkerClick}
 					infoOpen={this.state.infoOpen}
+					language={this.state.language}
 					markers={this.state.data}
 					userError={this.state.userError}
 					userPos={this.state.userPos}
