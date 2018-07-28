@@ -15,7 +15,7 @@
 		"featureType": "poi",
 		"stylers": [
 			{
-				"visibility": "on"
+				"visibility": "off"
 			}
 		]
 	},
@@ -24,7 +24,7 @@
 		"elementType": "labels.text",
 		"stylers": [
 			{
-				"visibility": "on"
+				"visibility": "off"
 			}
 		]
 	},
@@ -36,7 +36,7 @@
 				"color": "#9f795f"
 			},
 			{
-				"visibility": "on"
+				"visibility": "off"
 			}
 		]
 	},
@@ -48,7 +48,7 @@
 				"hue": "#ff6800"
 			},
 			{
-				"visibility": "on"
+				"visibility": "off"
 			},
 			{
 				"saturation": "-60"
@@ -60,7 +60,7 @@
 		"elementType": "geometry.fill",
 		"stylers": [
 			{
-				"visibility": "on"
+				"visibility": "off"
 			},
 			{
 				"hue": "#1900ff"
@@ -98,7 +98,7 @@
 		"featureType": "poi.park",
 		"stylers": [
 			{
-				"visibility": "on"
+				"visibility": "off"
 			},
 			{
 				"hue": "#1900ff"
@@ -152,7 +152,7 @@
 		"elementType": "labels",
 		"stylers": [
 			{
-				"visibility": "off"
+				"visibility": "on"
 			}
 		]
 	},

@@ -13,7 +13,7 @@ import Overlay from 'components/Overlay/Overlay.jsx';
 import Spinner from 'components/Spinner/Spinner.jsx';
 
 import Login from 'components/Login/Login.jsx';
-import MapStyle from 'data/ADMIN-STYLE.json';
+import MapStyle from 'data/MAP-STYLE.json';
 import './Admin.css';
 
 const MAP = {

@@ -8,6 +8,7 @@
   color: #58bfbf;
   color: #6b02ce;
   user-select: none;
+  text-transform: uppercase;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3); }
   .btn:not(.IconButton--dark):not(.IconButton--active):hover, .btn:not(.IconButton--dark):not(.IconButton--active):focus {
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3); }
@@ -17,7 +18,7 @@ button:disabled {
   color: white; }
 
 .DangerButton {
-  background-color: #f85050;
+  background-color: #db5461;
   color: white; }
 
 .IconButton {

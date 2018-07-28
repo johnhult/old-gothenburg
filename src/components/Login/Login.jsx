@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import firebase from 'firebase/app';
 import 'firebase/app';
 import 'firebase/auth';
@@ -70,12 +69,5 @@ class Login extends Component {
 		);
 	}
 }
-
-Login.defaultProps = {
-	//	Example defaultProps
-	//	label: 'click me'
-};
-
-Login.propTypes = {};
 
 export default Login;

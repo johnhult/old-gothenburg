@@ -10,6 +10,7 @@
 	color: darken($blue, 10%);
 	color: $purple;
 	user-select: none;
+	text-transform: uppercase;
 	box-shadow: 0px 3px 6px rgba(black, 0.3);
 	&:not(.IconButton--dark):not(.IconButton--active):hover, &:not(.IconButton--dark):not(.IconButton--active):focus {
 		box-shadow: 0px 5px 10px rgba(black, 0.3);

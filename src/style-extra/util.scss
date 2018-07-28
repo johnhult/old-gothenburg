@@ -45,6 +45,11 @@
     width: 100%;
 }
 
+.u-invis {
+	opacity: 0;
+	pointer-events: none;
+}
+
 $marginConfig: (smallMargin: $smallMargin, standardMargin: $standardMargin, bigMargin: $bigMargin, doubleMargin: $doubleMargin);
 @each $margin, $marginVar in $marginConfig {
     .u-#{$margin} {

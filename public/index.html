@@ -3,11 +3,13 @@
 
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,shrink-to-fit=no,user-scalable=no">
-	<meta name="apple-mobile-web-app-title" content="Old Gothenburg">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,shrink-to-fit=no,user-scalable=no">
 	<meta name="application-name" content="Old Gothenburg">
-	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-title" content="Old Gothenburg">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="default">
 	<meta name="description" content="Get to know Gothenburg. Audio markers and information about Gothenburg and the city's history. Walk around Gothenburg and see interesting locations that exists around you."
 	/>
 	<meta name="keywords" content="audio, gothenburg, göteborg, maps, web, app, webapp, google maps, interactive, sound, guide, tour, visitor, tourist, wanderlust, history, information, city, town, learning"
@@ -57,6 +59,35 @@
 			To create a production bundle, use `npm run build`.
 		-->
 
+	<!-- If js is turned off we show error -->
+	<noscript class="noscript">
+		<div id="div100">
+			<h4>
+				This page (and like every single webpage in the world) doesn't work without javascript.
+				<br/> Please enable javascript in your browser to continue.
+			</h4>
+		</div>
+		<style>
+			.div100 {
+				width: 100%;
+				height: 100%;
+				text-align: center;
+				padding: 20px 5%;
+			}
+		</style>
+	</noscript>
+
+	<!-- Register service worker so there will be a promt for adding to homescreen -->
+	<script>
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.register('service-worker.js')
+				.then(function (reg) {
+					console.log("ServiceWorker registered");
+				}).catch(function (err) {
+					console.log("ServiceWorker not registered: ", err);
+				});
+		}
+	</script>
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-61386426-6"></script>
 	<script>

@@ -268,7 +268,12 @@ class AdminPointEdit extends Component {
 					this.props.showEdit ? 'AdminPointEdit--open' : ''
 				}`}
 			>
-				<h1 className="u-bigMargin">Add new point</h1>
+				<h1
+					className={`u-bigMargin ${!this.props.showEdit &&
+						'u-invis'}`}
+				>
+					{this.props.editMode === 'edit' ? 'Edit' : 'Add new'} point
+				</h1>
 				{this.props.showEdit && this.props.point ? (
 					<form className="AdminInputs">
 						<AdminInput

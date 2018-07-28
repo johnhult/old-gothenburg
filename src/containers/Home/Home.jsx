@@ -6,6 +6,7 @@ import 'firebase/firestore';
 import Map from 'components/Map/Map.jsx';
 import MarkerInfo from 'containers/MarkerInfo/MarkerInfo';
 import Spinner from 'components/Spinner/Spinner.jsx';
+import Tutorial from 'components/Tutorial/Tutorial.jsx';
 import './Home.css';
 
 const ERROR = {
@@ -23,10 +24,13 @@ class Home extends Component {
 			error: null,
 			infoLoading: false,
 			infoOpen: false,
+			language: 'en',
 			loadingMarkers: true,
 			loadingUserPos: true,
 			markerDataLoaded: [],
 			markerInfo: null,
+			shouldShowTutorial: true,
+			tutorialDone: false,
 			userError: null,
 			userPos: {
 				lat: 0,
@@ -44,24 +48,28 @@ class Home extends Component {
 				message = (
 					<div>
 						<Spinner />
-						<h1>Loading audio markers 🎵</h1>
-						<h4>Please wait</h4>
-					</div>
-				);
-			}
-			else if (this.state.loadingUserPos) {
-				message = (
-					<div>
-						<Spinner />
-						<h1>Loading user position 📍</h1>
-						<h4>Please wait</h4>
+						<h1>
+							{this.state.language === 'sv'
+								? 'Laddar markörer '
+								: 'Loading markers '}
+							🎵
+						</h1>
+						<h4>
+							{this.state.language === 'sv'
+								? 'Var god vänta'
+								: 'Please wait'}
+						</h4>
 					</div>
 				);
 			}
 			else {
 				message = (
 					<div>
-						<h1>Something went wrong, please reload...</h1>
+						<h1>
+							{this.state.language === 'sv'
+								? 'Något gick fel, prova att ladda om sidan...'
+								: 'Something went wrong, please reload...'}
+						</h1>
 					</div>
 				);
 			}
@@ -187,8 +195,64 @@ class Home extends Component {
 			);
 	}
 
-	componentDidMount() {
+	visitedBefore = () => {
+		let localStorage = window.localStorage;
+		if (localStorage) {
+			// Setup dates
+			let now = new Date();
+			let threeMonthsAgo = new Date(now);
+			threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+			// Has visitor been here before?
+			let lastVisited = localStorage.getItem('lastVisited');
+
+			if (lastVisited) {
+				lastVisited = new Date(lastVisited);
+
+				// Check if it was more than 3 months ago visited
+				let beenAWhile = lastVisited < threeMonthsAgo;
+				if (!beenAWhile) {
+					this.watchUserPos();
+				}
+				this.setState({
+					shouldShowTutorial: beenAWhile
+				});
+			}
+			else {
+				this.setState({
+					shouldShowTutorial: true
+				});
+			}
+
+			// TODO: Remove when done with tutorial
+			now.setMonth(now.getMonth() - 3);
+			localStorage.setItem('lastVisited', now);
+		}
+		else {
+			this.watchUserPos();
+		}
+	};
+
+	setTutorialDone = () => {
+		this.setState({
+			tutorialDone: true
+		});
 		this.watchUserPos();
+	};
+
+	checkLanguage = () => {
+		let language =
+			window.navigator.language === 'sv'
+				? window.navigator.language
+				: 'en';
+		this.setState({
+			language: language
+		});
+	};
+
+	componentDidMount() {
+		this.checkLanguage();
+		this.visitedBefore();
 		this.getMarkers(this.initFirebase());
 	}
 
@@ -197,6 +261,13 @@ class Home extends Component {
 			<div className="Loading">{this.getMessage()}</div>
 		) : (
 			<div className="MapWrapper">
+				{this.state.shouldShowTutorial &&
+					!this.state.tutorialDone && (
+						<Tutorial
+							onDone={this.setTutorialDone}
+							language={this.state.language}
+						/>
+					)}
 				<Map
 					apiKey={this.props.apiKey}
 					className="Map"

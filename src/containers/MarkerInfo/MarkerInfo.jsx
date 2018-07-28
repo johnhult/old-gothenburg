@@ -51,7 +51,8 @@ class MarkerInfo extends Component {
 						<CloseIcon handleClick={this.props.close} />
 						{!this.props.infoLoading ? null : (
 							<span className="MarkerLoadingSpinner">
-								<Spinner size={30} />Loading content
+								<Spinner size={30} margins="0 20px 0 0" />Loading
+								content
 							</span>
 						)}
 					</div>

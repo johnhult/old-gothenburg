@@ -96,10 +96,10 @@ input:focus + .MovingText, textarea:focus + .MovingText {
   z-index: -1; }
 
 .InputError {
-  border: 1px solid #f85050; }
+  border: 1px solid #db5461; }
 
 .FileError {
-  background-color: #f85050; }
+  background-color: #db5461; }
 
 .TextareaError {
-  border: 1px solid #f85050; }
+  border: 1px solid #db5461; }

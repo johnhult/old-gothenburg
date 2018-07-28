@@ -1,3 +1,5 @@
+@import 'style-extra/variables.scss';
+
 .ClusterMarker {
 	display: flex;
 	align-items: center;
@@ -5,13 +7,14 @@
 	height: 40px;
 	width: 40px;
 	border-radius: 40px;
-	background-color: black;
+	background-color: $red;
 	color: white;
-	font-size: 1.4rem;
+	font-size: 1.2rem;
+	font-weight: 700;
 	transform: translate(-50%, -50%);
 	span {
-		position: relative;
-		top: -1px;
-		right: -1px;
+		height: 100%;
+		width: 100%;
+		line-height: 40px;
 	}
 }

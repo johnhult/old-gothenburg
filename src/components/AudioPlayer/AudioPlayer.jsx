@@ -13,10 +13,7 @@ class AudioPlayer extends Component {
 		this.state = {
 			currentTime: '00:00',
 			endTime: '00:00',
-			// intervalInitiated: false,
-			// player: null,
 			playing: false,
-			// progressBar: null,
 			width: 0
 		};
 		this.interval = null;
@@ -30,10 +27,6 @@ class AudioPlayer extends Component {
 			this.updateAudioDetails(this.player.currentTime);
 		}, 100);
 		this.intervalInitiated = true;
-		// this.setState({
-		// 	// interval: interval,
-		// 	intervalInitiated: true
-		// });
 	};
 
 	initAudioTime = player => {
@@ -53,21 +46,16 @@ class AudioPlayer extends Component {
 		this.handleResize();
 
 		// Setup correct player
-		this.player = new Audio(this.props.audioPath);
+		this.player = new Audio();
 		this.progressBar = document.querySelector('.ProgressBar');
 
 		// Add event for audio stopped for play button
 		this.player.addEventListener('ended', () => this.toggleAudioPlay());
-
-		// Set state to correct player
-		// TODO: Do this in update aswell going from one to another
-		// this.setState({
-		// 	player: player,
-		// 	progressBar: progressBar
-		// });
 		this.player.addEventListener('loadedmetadata', () =>
 			this.initAudioTime(this.player)
 		);
+		this.player.src = this.props.audioPath;
+		this.player.load();
 	};
 
 	toggleAudioPlay = () => {
@@ -90,12 +78,12 @@ class AudioPlayer extends Component {
 		if (!this.player || !this.progressBar) {
 			return;
 		}
-		this.progressBar.value = playerCurrentTime / this.player.duration;
-		// let prog = this.progressBar;
-		// prog.value = playerCurrentTime / this.player.duration;
-		// this.setState({
-		// 	progressBar: prog
-		// });
+		if (!this.player.duration) {
+			this.progressBar.value = 0;
+		}
+		else {
+			this.progressBar.value = playerCurrentTime / this.player.duration;
+		}
 	};
 
 	updateTime = playerCurrentTime => {
@@ -119,17 +107,9 @@ class AudioPlayer extends Component {
 			return;
 		}
 		let percent = event.nativeEvent.offsetX / this.progressBar.offsetWidth;
-		// let prog = this.progressBar;
-		// prog.value = percent;
 		this.progressBar.value = percent;
 		let newTime = percent * this.player.duration;
 		this.player.currentTime = newTime;
-		// let player = this.player;
-		// player.currentTime = newTime;
-		// this.setState({
-		// 	player: player,
-		// 	progressBar: prog
-		// });
 		this.updateTime(newTime);
 	};
 
@@ -140,12 +120,8 @@ class AudioPlayer extends Component {
 	};
 
 	resetInterval = () => {
-		console.log('reset');
 		clearInterval(this.interval);
 		this.intervalInitiated = false;
-		// this.setState({
-		// 	intervalInitiated: false
-		// });
 	};
 
 	addResize = () => {
@@ -174,7 +150,6 @@ class AudioPlayer extends Component {
 
 		// If we close info we reset and remove resize event
 		if (!nextProps.infoOpen && openChangedState) {
-			console.log('will update');
 			if (isAudioPlaying) {
 				this.toggleAudioPlay();
 			}
@@ -193,7 +168,6 @@ class AudioPlayer extends Component {
 
 		// If we change marker we need to update
 		if (markerChanged) {
-			console.log('did update');
 			this.initPlayer();
 		}
 
@@ -210,10 +184,6 @@ class AudioPlayer extends Component {
 					this.state.width < 800 ? 'AudioPlayer--extended' : ''
 				}`}
 			>
-				<audio className="MarkerAudio" preload="metadata">
-					<source src={this.props.audioPath} type="audio/mp3" />
-					Your device doesn't support audio format.
-				</audio>
 				<div className="PlayerControls">
 					<div className="PlayButton" onClick={this.toggleAudioPlay}>
 						{this.state.playing ? (
