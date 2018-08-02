@@ -31,3 +31,8 @@
 .Map {
   width: 100vw;
   height: 100vh; }
+
+.SettingsButton {
+  position: absolute;
+  right: 10px;
+  top: 10px; }

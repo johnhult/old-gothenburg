@@ -3,14 +3,19 @@ import firebase from 'firebase/app';
 import 'firebase/app';
 import 'firebase/firestore';
 
+import Button from 'components/Button/Button.jsx';
 import Map from 'components/Map/Map.jsx';
 import MarkerInfo from 'containers/MarkerInfo/MarkerInfo';
+import Settings from 'components/Settings/Settings.jsx';
 import Spinner from 'components/Spinner/Spinner.jsx';
 import Tutorial from 'components/Tutorial/Tutorial.jsx';
+import SettingsImg from 'img/icons/settings.svg';
 import './Home.css';
 
 const ERROR = {
 	noGeoLocation: 'Your device doesn\'t seem to have any location service.',
+	noMarkerData:
+		'Couldn\'t find data. Try reloading. If that doesn\'t work there might be something wrong with the specific marker.',
 	noMarkers: 'Couldn\'t load markers. 😭 Please reload or try later.',
 	noUserPos:
 		'Allow your device to use location in order to use the audio tour in Gothenburg. 📍'
@@ -20,7 +25,6 @@ class Home extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			data: null,
 			error: null,
 			infoLoading: false,
 			infoOpen: false,
@@ -29,6 +33,7 @@ class Home extends Component {
 			loadingUserPos: true,
 			markerDataLoaded: [],
 			markerInfo: null,
+			markers: null,
 			shouldShowTutorial: true,
 			tutorialDone: false,
 			userError: null,
@@ -112,30 +117,48 @@ class Home extends Component {
 	};
 
 	handleMarkerClick = clickedMarker => {
+		this.openMarker = clickedMarker;
+		let fetchMarkerData =
+			this.state.language === 'sv'
+				? clickedMarker.markerInfoSwe
+				: clickedMarker.markerInfoEng;
 		this.setState({
+			error: null,
 			infoLoading: true,
 			infoOpen: true
 		});
-		this.openMarker = clickedMarker;
-		let data = this.state.markerDataLoaded.find(
-			markerExist => markerExist.key === clickedMarker.markerInfo.id
-		);
+		let data;
+		if (fetchMarkerData) {
+			data = this.state.markerDataLoaded[fetchMarkerData.id];
+		}
 		if (data) {
-			this.setState({ infoLoading: false, markerInfo: data });
+			this.setState({
+				error: null,
+				infoLoading: false,
+				markerInfo: data
+			});
+		}
+		else if (!fetchMarkerData) {
+			this.setState({
+				error: ERROR.noMarkerData,
+				infoLoading: false
+			});
 		}
 		else {
-			clickedMarker.markerInfo.get().then(
+			fetchMarkerData.get().then(
 				querySnapshot => {
 					let dataFetchedKey = querySnapshot.id;
 					data = querySnapshot.data();
 					data = { ...data, key: dataFetchedKey };
-					if (dataFetchedKey === this.openMarker.markerInfo.id) {
+					if (dataFetchedKey === fetchMarkerData.id) {
+						let newData = {
+							...this.state.markerDataLoaded,
+							[dataFetchedKey]: data
+						};
 						this.setState({
+							error: null,
 							infoLoading: false,
-							markerDataLoaded: [
-								...this.state.markerDataLoaded,
-								data
-							],
+							markerDataLoaded: newData,
 							markerInfo: data
 						});
 					}
@@ -150,11 +173,26 @@ class Home extends Component {
 				},
 				() => {
 					this.setState({
+						error: ERROR.noMarkerData,
 						infoLoading: false
 					});
 				}
 			);
 		}
+	};
+
+	toggleSettings = () => {
+		this.setState({
+			infoOpen: false,
+			showSettings: !this.state.showSettings
+		});
+	};
+
+	showTutorial = () => {
+		this.setState({
+			shouldShowTutorial: true,
+			showSettings: false
+		});
 	};
 
 	initFirebase() {
@@ -181,7 +219,7 @@ class Home extends Component {
 						let marker = { ...doc.data(), id: doc.id };
 						markers.push(marker);
 					});
-					this.setState({ data: markers, loadingMarkers: false });
+					this.setState({ loadingMarkers: false, markers: markers });
 				},
 				() => {
 					this.setState({
@@ -221,8 +259,6 @@ class Home extends Component {
 				});
 			}
 
-			// TODO: Remove when done with tutorial
-			// now.setMonth(now.getMonth() - 3);
 			localStorage.setItem('lastVisited', now);
 		}
 		else {
@@ -238,12 +274,15 @@ class Home extends Component {
 	};
 
 	checkLanguage = () => {
-		let language =
-			window.navigator.language === 'sv'
-				? window.navigator.language
-				: 'en';
+		let language = window.navigator.language === 'sv' ? 'sv' : 'en';
 		this.setState({
 			language: language
+		});
+	};
+
+	changeLanguage = newLang => {
+		this.setState({
+			language: newLang
 		});
 	};
 
@@ -254,7 +293,7 @@ class Home extends Component {
 	}
 
 	render() {
-		return this.state.loadingMarkers || this.state.error ? (
+		return this.state.loadingMarkers ? (
 			<div className="Loading">{this.getMessage()}</div>
 		) : (
 			<div className="MapWrapper">
@@ -265,13 +304,21 @@ class Home extends Component {
 							language={this.state.language}
 						/>
 					)}
+				{this.state.showSettings && (
+					<Settings
+						handleLanguageSwitch={this.changeLanguage}
+						handleShowTutorial={this.showTutorial}
+						toggleSettings={this.toggleSettings}
+						language={this.state.language}
+					/>
+				)}
 				<Map
 					apiKey={this.props.apiKey}
 					className="Map"
 					handleMarkerClick={this.handleMarkerClick}
 					infoOpen={this.state.infoOpen}
 					language={this.state.language}
-					markers={this.state.data}
+					markers={this.state.markers}
 					userError={this.state.userError}
 					userPos={this.state.userPos}
 				/>
@@ -279,7 +326,18 @@ class Home extends Component {
 					close={this.closeInfo}
 					infoLoading={this.state.infoLoading}
 					infoOpen={this.state.infoOpen}
+					markerError={
+						this.state.error === ERROR.noMarkerData
+							? this.state.error
+							: ''
+					}
 					markerInfo={this.state.markerInfo}
+				/>
+				<Button
+					className="SettingsButton IconButton--small"
+					handleClick={this.toggleSettings}
+					type="icon"
+					imgPath={SettingsImg}
 				/>
 			</div>
 		);

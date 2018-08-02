@@ -31,18 +31,15 @@ button:disabled {
 	align-items: center;
 	justify-content: center;
 	padding: 0;
-	box-shadow: none;
 	background-color: white;
 	path, polygon, circle, rect {
 		transition: 0.2s;
-		fill: $blue;
+		fill: $purple;
 	}
 }
-.IconButton:hover {
-	background-color: $blue;
-	path, polygon, circle, rect {
-		fill: white;
-	}
+.IconButton--small {
+	width: 30px;
+	height: 30px;
 }
 .IconButton--dark {
 	background-color: transparent;

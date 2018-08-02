@@ -29,13 +29,13 @@ class AudioPlayer extends Component {
 		this.intervalInitiated = true;
 	};
 
-	initAudioTime = player => {
-		let playerCurrentTime = player.currentTime;
+	initAudioTime = () => {
+		let playerCurrentTime = this.player.currentTime;
 
 		let currentTime = this.calculateTime(playerCurrentTime);
 		this.setState({
 			currentTime: currentTime,
-			endTime: this.calculateTime(player.duration)
+			endTime: this.calculateTime(this.player.duration)
 		});
 		this.updateScrubber(playerCurrentTime);
 	};
@@ -50,10 +50,8 @@ class AudioPlayer extends Component {
 		this.progressBar = document.querySelector('.ProgressBar');
 
 		// Add event for audio stopped for play button
-		this.player.addEventListener('ended', () => this.toggleAudioPlay());
-		this.player.addEventListener('loadedmetadata', () =>
-			this.initAudioTime(this.player)
-		);
+		this.player.addEventListener('ended', this.toggleAudioPlay);
+		this.player.addEventListener('loadedmetadata', this.initAudioTime);
 		this.player.src = this.props.audioPath;
 		this.player.load();
 	};
@@ -132,6 +130,11 @@ class AudioPlayer extends Component {
 		window.removeEventListener('resize', this.handleResize);
 	};
 
+	clearAudioEvents = () => {
+		this.player.removeEventListener('loadedmetadata', this.initAudioTime);
+		this.player.removeEventListener('ended', this.toggleAudioPlay);
+	};
+
 	componentDidMount = () => {
 		this.initPlayer();
 	};
@@ -141,6 +144,7 @@ class AudioPlayer extends Component {
 			this.toggleAudioPlay();
 		}
 		this.clearResize();
+		this.clearAudioEvents();
 	};
 
 	componentWillUpdate = nextProps => {

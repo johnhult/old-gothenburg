@@ -28,16 +28,14 @@ button:disabled {
   align-items: center;
   justify-content: center;
   padding: 0;
-  box-shadow: none;
   background-color: white; }
   .IconButton path, .IconButton polygon, .IconButton circle, .IconButton rect {
     transition: 0.2s;
-    fill: #7dcdcd; }
+    fill: #6b02ce; }
 
-.IconButton:hover {
-  background-color: #7dcdcd; }
-  .IconButton:hover path, .IconButton:hover polygon, .IconButton:hover circle, .IconButton:hover rect {
-    fill: white; }
+.IconButton--small {
+  width: 30px;
+  height: 30px; }
 
 .IconButton--dark {
   background-color: transparent;

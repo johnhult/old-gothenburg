@@ -14,6 +14,13 @@ class MarkerInfo extends Component {
 	}
 
 	getLayout = () => {
+		if (this.props.markerError) {
+			return (
+				<div className="MarkerText">
+					<h1 className="MarkerHeader">{this.props.markerError}</h1>
+				</div>
+			);
+		}
 		return !this.props.infoLoading && this.props.markerInfo ? (
 			<div className="MarkerText">
 				<h1 className="MarkerHeader">{this.props.markerInfo.header}</h1>
@@ -72,6 +79,7 @@ MarkerInfo.propTypes = {
 	close: PropTypes.func.isRequired,
 	infoLoading: PropTypes.bool.isRequired,
 	infoOpen: PropTypes.bool,
+	markerError: PropTypes.string,
 	markerInfo: PropTypes.object
 };
 

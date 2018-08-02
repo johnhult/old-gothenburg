@@ -50,6 +50,10 @@
 	pointer-events: none;
 }
 
+.u-greyText {
+	color: $mediumGrey;
+}
+
 $marginConfig: (smallMargin: $smallMargin, standardMargin: $standardMargin, bigMargin: $bigMargin, doubleMargin: $doubleMargin);
 @each $margin, $marginVar in $marginConfig {
     .u-#{$margin} {

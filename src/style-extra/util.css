@@ -38,6 +38,9 @@
   opacity: 0;
   pointer-events: none; }
 
+.u-greyText {
+  color: #999999; }
+
 .u-smallMargin {
   margin-bottom: 5px; }
 

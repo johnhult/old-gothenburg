@@ -65,7 +65,7 @@ class Map extends Component {
 		const clusters = supercluster(markers, {
 			maxZoom: 16,
 			minZoom: 4,
-			radius: 60
+			radius: 40
 		});
 
 		return clusters(this.state.mapOptions);

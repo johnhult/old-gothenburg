@@ -2,17 +2,66 @@
   width: 100%;
   height: 0;
   transition: 0.6s;
-  padding: 0 20px 0;
+  padding: 0 20px;
   overflow: auto; }
 
 .AdminPointEdit--open {
+  padding: 20px;
   height: 80%; }
+
+.PositionWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; }
+
+.PositionText {
+  display: block;
+  margin: 0 5px; }
 
 .AdminInputs {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center; }
+
+.InputDivider {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  padding: 20px 10px 0;
+  color: white;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  max-width: 800px; }
+  .InputDivider input, .InputDivider textarea {
+    color: white; }
+  .InputDivider .Label, .InputDivider .LabelTextarea {
+    margin: 0 10px 30px;
+    width: 50%;
+    flex: 1;
+    min-width: 200px; }
+  .InputDivider .LabelFile {
+    flex: 1; }
+  .InputDivider h4 {
+    margin-bottom: 20px;
+    width: 100%; }
+  .InputDivider .SelectWrapper {
+    width: 100%;
+    height: 60px; }
+
+.HeaderDivider {
+  background-color: #eea334; }
+
+.TextDivider {
+  background-color: #3F6A8A; }
+
+.AudioDivider {
+  background-color: #333333; }
+
+.TypeDivider {
+  background-color: #f599ad; }
 
 .ButtonWrapper button {
   margin: 10px; }

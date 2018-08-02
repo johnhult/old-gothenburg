@@ -1,0 +1,48 @@
+.Settings {
+  display: flex;
+  flex-direction: column;
+  width: 500px;
+  max-width: 100%;
+  margin: 0 auto;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  min-height: 100%;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); }
+  @media screen and (min-width: 800px) {
+    .Settings {
+      min-height: initial; } }
+
+.LanguageWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center; }
+
+.LanguageChoice {
+  width: 50%;
+  padding: 10px;
+  margin: 0 5px;
+  border: 1px solid #e6e6e6;
+  transition: .2s;
+  cursor: pointer; }
+  .LanguageChoice:not(.LanguageChoice--active):hover {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); }
+  .LanguageChoice:not(.LanguageChoice--active):active {
+    box-shadow: none; }
+
+.LanguageChoice--active {
+  color: white;
+  border-color: #7dcdcd;
+  background-color: #7dcdcd; }
+
+.TutorialWrapper {
+  padding: 10px;
+  border: 1px solid #e6e6e6;
+  cursor: pointer; }
+  .TutorialWrapper:hover {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); }
+  .TutorialWrapper:active {
+    box-shadow: none; }
+
+.CloseSettingsButton {
+  margin-top: auto; }

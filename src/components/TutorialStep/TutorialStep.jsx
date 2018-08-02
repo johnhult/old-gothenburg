@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 const stepImages = [
 	'https://firebasestorage.googleapis.com/v0/b/old-gothenburg.appspot.com/o/tutorial-images%2Ftut-0.svg?alt=media&token=66dae480-f13a-4dc8-b281-c40d1174b336',
 	'https://firebasestorage.googleapis.com/v0/b/old-gothenburg.appspot.com/o/tutorial-images%2Ftut-1.svg?alt=media&token=c21554fd-de3e-4268-ba4c-0103ba1364e0',
-	'https://firebasestorage.googleapis.com/v0/b/old-gothenburg.appspot.com/o/tutorial-images%2Ftut-2.svg?alt=media&token=c11c3d3a-c3c4-41f4-a3d2-c25fec96c554',
+	'https://firebasestorage.googleapis.com/v0/b/old-gothenburg.appspot.com/o/tutorial-images%2Ftut-2.svg?alt=media&token=2c78920f-d1e4-4f97-9957-6deb8fa3aa8a',
 	'https://firebasestorage.googleapis.com/v0/b/old-gothenburg.appspot.com/o/tutorial-images%2Ftut-3.svg?alt=media&token=e472b958-6d36-483f-a465-afbbd599a2aa',
 	'https://firebasestorage.googleapis.com/v0/b/old-gothenburg.appspot.com/o/tutorial-images%2Ftut-4.svg?alt=media&token=165fdd21-7f81-4a5f-ad96-6ff584c6eb94'
 ];
@@ -23,7 +23,7 @@ const stepsEng = [
 	{
 		header: 'Different markers.',
 		text:
-			'There are some different markers. Some are for specific buildings, some more focused on culture, and some are general information.'
+			'Some are for specific buildings, some more focused on culture, and some are general information. Markers close to each others will get grouped. The number shows how many markers are there.'
 	},
 	{
 		header: 'Tips.',
@@ -49,7 +49,7 @@ const stepsSwe = [
 	{
 		header: 'Olika markörer.',
 		text:
-			'Det finns några olika markörer. Vissa är för specifica byggnader, andra mer fokuserade på kultur. Sen finns det också markörer med generell information.'
+			'Vissa är för specifica byggnader, andra mer fokuserade på kultur och visa är generell information. Markörer nära varandra kommer grupperas. Siffran i röda cirkeln visar hur många markörer det finns där.'
 	},
 	{
 		header: 'Tips.',

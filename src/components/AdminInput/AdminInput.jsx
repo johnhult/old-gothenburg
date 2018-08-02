@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import ReactSVG from 'react-svg';
 
+import Play from 'img/icons/play.svg';
 import './AdminInput.css';
 
 class AdminInput extends Component {
@@ -33,6 +35,11 @@ class AdminInput extends Component {
 		}
 		return (
 			<label
+				id={
+					this.props.id && this.props.type === 'file'
+						? this.props.id
+						: ''
+				}
 				className={`Label ${
 					this.props.type === 'file' ? 'LabelFile' : ''
 				} ${
@@ -48,7 +55,9 @@ class AdminInput extends Component {
 				<input
 					className={`${
 						this.props.value !== '' ? 'InputHasValue' : ''
-					} ${this.props.type === 'file' ? 'InputFile' : ''}`}
+					} ${this.props.styling === 'light' ? 'InputLight' : ''} ${
+						this.props.type === 'file' ? 'InputFile' : ''
+					}`}
 					name={this.props.name}
 					type={this.props.type}
 					onChange={this.props.handleChange}
@@ -58,14 +67,27 @@ class AdminInput extends Component {
 					disabled={this.props.disabled}
 					accept={this.props.type === 'file' ? 'audio/mp3' : ''}
 				/>
+				{this.props.type === 'file' ? (
+					<div className="FileFocus" />
+				) : null}
+				{this.props.type === 'file' ? (
+					<div className="FileCircle">
+						<ReactSVG path={Play} />
+					</div>
+				) : null}
+				{this.props.type === 'file' ? (
+					<span className="FileText">
+						{this.props.audioValue !== '' && this.props.audioValue
+							? this.props.audioValue.split('\\').pop()
+							: 'Drag and drop or click to upload'}
+					</span>
+				) : null}
 				<span
 					className={`${
-						this.props.type === 'file' ? 'FileText' : 'MovingText'
+						this.props.type === 'file' ? 'FileLabel' : 'MovingText'
 					}`}
 				>
-					{this.props.type === 'file' && this.props.value !== ''
-						? this.props.value.split('\\').pop()
-						: this.props.label}
+					{this.props.label}
 				</span>
 			</label>
 		);
@@ -83,8 +105,9 @@ AdminInput.propTypes = {
 	name: PropTypes.string,
 	required: PropTypes.bool,
 	showError: PropTypes.bool.isRequired,
+	styling: PropTypes.string,
 	type: PropTypes.string,
-	value: PropTypes.string.isRequired
+	value: PropTypes.string
 };
 
 export default AdminInput;

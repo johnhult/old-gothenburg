@@ -236,17 +236,19 @@ class Admin extends React.Component {
 				}
 			);
 		}
-		marker.markerInfo.get().then(
-			querySnapshot => {
-				let data = querySnapshot.data();
-				this.setState({
-					loadedMarkerInfo: data
-				});
-			},
-			error => {
-				this.setState({ error: error });
-			}
-		);
+
+		// Get marker data
+		let getPromise = Promise.all([
+			marker.markerInfoEng.get(),
+			marker.markerInfoSwe.get()
+		]);
+
+		getPromise.then(markerInfos => {
+			let both = markerInfos.map(markerInfo => markerInfo.data());
+			this.setState({
+				loadedMarkerInfo: { eng: both[0], swe: both[1] }
+			});
+		});
 	};
 
 	addPoint = latLng => {
@@ -276,43 +278,43 @@ class Admin extends React.Component {
 		this.setState({
 			removeLoading: true
 		});
-		let audioRef = firebase
+
+		// Get ref to both audiofiles
+		let audioRefEng = firebase
 			.storage()
-			.refFromURL(this.state.loadedMarkerInfo.audioPath);
-		let markerInfoRef = this.state.loadedMarker.markerInfo;
-		let markerRef = this.state.loadedMarker.selfReference;
-		audioRef.delete().then(
-			() => {
-				markerInfoRef.delete().then(
-					() => {
-						markerRef.delete().then(
-							() => {
-								this.setState({
-									removeLoading: false
-								});
-								this.closeRemove();
-								this.getMarkers();
-							},
-							error => {
-								this.setState({
-									error: error
-								});
-							}
-						);
-					},
-					error => {
-						this.setState({
-							error: error
-						});
-					}
-				);
-			},
-			error => {
-				this.setState({
-					error: error
-				});
-			}
-		);
+			.refFromURL(this.state.loadedMarkerInfo.eng.audioPath);
+		let audioRefSwe = firebase
+			.storage()
+			.refFromURL(this.state.loadedMarkerInfo.swe.audioPath);
+
+		// Delete both audio files
+		let whenAudioDeleted = Promise.all([
+			audioRefEng.delete(),
+			audioRefSwe.delete()
+		]);
+
+		// Delete the rest
+		let whenMarkersDeleted = whenAudioDeleted.then(() => {
+			let references = [
+				this.state.loadedMarker.markerInfoEng,
+				this.state.loadedMarker.markerInfoSwe,
+				this.state.loadedMarker.selfReference
+			];
+			let batch = this.db.batch();
+			references.forEach(ref => {
+				batch.delete(ref);
+			});
+			return batch.commit();
+		});
+
+		// When last is deleted we close and reload markers
+		whenMarkersDeleted.then(() => {
+			this.setState({
+				removeLoading: false
+			});
+			this.closeRemove();
+			this.getMarkers();
+		});
 	};
 
 	handleChildClick = clickedMarkerId => {
@@ -386,7 +388,10 @@ class Admin extends React.Component {
 					<Overlay
 						header={`Remove point${
 							this.state.loadedMarkerInfo
-								? ' ' + this.state.loadedMarkerInfo.header
+								? ' ' +
+								  this.state.loadedMarkerInfo.swe.header +
+								  '/' +
+								  this.state.loadedMarkerInfo.eng.header
 								: ''
 						}?`}
 						loading={!this.state.loadedMarkerInfo}
