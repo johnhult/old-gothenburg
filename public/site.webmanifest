@@ -13,7 +13,7 @@
 			"type": "image/png"
 		}
 	],
-	"start_url": "/?utm_source=homescreen",
+	"start_url": "/?utm_source=homescreen&utm_medium=homescreen&utm_campaign=addedToHomescreen",
 	"theme_color": "#ffffff",
 	"background_color": "#ffffff",
 	"display": "standalone"

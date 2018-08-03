@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-const stepImages = [
-	'https://firebasestorage.googleapis.com/v0/b/old-gothenburg.appspot.com/o/tutorial-images%2Ftut-0.svg?alt=media&token=66dae480-f13a-4dc8-b281-c40d1174b336',
-	'https://firebasestorage.googleapis.com/v0/b/old-gothenburg.appspot.com/o/tutorial-images%2Ftut-1.svg?alt=media&token=c21554fd-de3e-4268-ba4c-0103ba1364e0',
-	'https://firebasestorage.googleapis.com/v0/b/old-gothenburg.appspot.com/o/tutorial-images%2Ftut-2.svg?alt=media&token=2c78920f-d1e4-4f97-9957-6deb8fa3aa8a',
-	'https://firebasestorage.googleapis.com/v0/b/old-gothenburg.appspot.com/o/tutorial-images%2Ftut-3.svg?alt=media&token=e472b958-6d36-483f-a465-afbbd599a2aa',
-	'https://firebasestorage.googleapis.com/v0/b/old-gothenburg.appspot.com/o/tutorial-images%2Ftut-4.svg?alt=media&token=165fdd21-7f81-4a5f-ad96-6ff584c6eb94'
-];
+import tut0 from 'img/tutorial/tut-0.svg';
+import tut1 from 'img/tutorial/tut-1.svg';
+import tut2 from 'img/tutorial/tut-2.svg';
+import tut3 from 'img/tutorial/tut-3.svg';
+import tut4 from 'img/tutorial/tut-4.svg';
+
+const stepImages = [tut0, tut1, tut2, tut3, tut4];
 
 const stepsEng = [
 	{

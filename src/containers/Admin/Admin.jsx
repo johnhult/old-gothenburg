@@ -8,13 +8,14 @@ import 'firebase/auth';
 
 import AdminPointEdit from 'containers/AdminPointEdit/AdminPointEdit.jsx';
 import AdminUtility from 'components/AdminUtility/AdminUtility.jsx';
+import Login from 'components/Login/Login.jsx';
 import Marker from 'components/Marker/Marker.jsx';
 import Overlay from 'components/Overlay/Overlay.jsx';
 import Spinner from 'components/Spinner/Spinner.jsx';
 
-import Login from 'components/Login/Login.jsx';
 import MapStyle from 'data/MAP-STYLE.json';
 import './Admin.css';
+import { getEmptyMarkerInfo } from '../../util/util';
 
 const MAP = {
 	defaultCenter: {
@@ -238,13 +239,20 @@ class Admin extends React.Component {
 		}
 
 		// Get marker data
-		let getPromise = Promise.all([
-			marker.markerInfoEng.get(),
-			marker.markerInfoSwe.get()
-		]);
+		let markerInfoEngTask = marker.markerInfoEng
+			? marker.markerInfoEng.get()
+			: '';
+		let markerInfoSweTask = marker.markerInfoSwe
+			? marker.markerInfoSwe.get()
+			: '';
+
+		let getPromise = Promise.all([markerInfoEngTask, markerInfoSweTask]);
 
 		getPromise.then(markerInfos => {
-			let both = markerInfos.map(markerInfo => markerInfo.data());
+			let both = markerInfos.map(
+				markerInfo =>
+					markerInfo ? markerInfo.data() : getEmptyMarkerInfo()
+			);
 			this.setState({
 				loadedMarkerInfo: { eng: both[0], swe: both[1] }
 			});
@@ -279,33 +287,44 @@ class Admin extends React.Component {
 			removeLoading: true
 		});
 
-		// Get ref to both audiofiles
-		let audioRefEng = firebase
-			.storage()
-			.refFromURL(this.state.loadedMarkerInfo.eng.audioPath);
-		let audioRefSwe = firebase
-			.storage()
-			.refFromURL(this.state.loadedMarkerInfo.swe.audioPath);
+		// Get ref to both audiofiles if they exist
+		let audioRefEng = this.state.loadedMarkerInfo.eng.audioPath
+			? firebase
+					.storage()
+					.refFromURL(this.state.loadedMarkerInfo.eng.audioPath)
+			: '';
+		let audioRefSwe = this.state.loadedMarkerInfo.swe.audioPath
+			? firebase
+					.storage()
+					.refFromURL(this.state.loadedMarkerInfo.swe.audioPath)
+			: '';
+
+		let audioRefEngTask = audioRefEng ? audioRefEng.delete() : '';
+		let audioRefSweTask = audioRefSwe ? audioRefSwe.delete() : '';
 
 		// Delete both audio files
-		let whenAudioDeleted = Promise.all([
-			audioRefEng.delete(),
-			audioRefSwe.delete()
-		]);
+		let whenAudioDeleted = Promise.all([audioRefEngTask, audioRefSweTask]);
 
-		// Delete the rest
-		let whenMarkersDeleted = whenAudioDeleted.then(() => {
-			let references = [
-				this.state.loadedMarker.markerInfoEng,
-				this.state.loadedMarker.markerInfoSwe,
-				this.state.loadedMarker.selfReference
-			];
-			let batch = this.db.batch();
-			references.forEach(ref => {
-				batch.delete(ref);
-			});
-			return batch.commit();
+		// Setup delete for marker and marker info
+		let references = [
+			this.state.loadedMarker.markerInfoEng,
+			this.state.loadedMarker.markerInfoSwe,
+			this.state.loadedMarker.selfReference
+		];
+		let batch = this.db.batch();
+		references.forEach(ref => {
+			batch.delete(ref);
 		});
+		// Delete the rest
+		let whenMarkersDeleted = whenAudioDeleted.then(
+			() => {
+				return batch.commit();
+			},
+			error => {
+				// Even if we get error from audio delete we want to delete marker and marker info
+				return batch.commit();
+			}
+		);
 
 		// When last is deleted we close and reload markers
 		whenMarkersDeleted.then(() => {

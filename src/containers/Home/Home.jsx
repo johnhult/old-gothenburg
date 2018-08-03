@@ -333,12 +333,14 @@ class Home extends Component {
 					}
 					markerInfo={this.state.markerInfo}
 				/>
-				<Button
-					className="SettingsButton IconButton--small"
-					handleClick={this.toggleSettings}
-					type="icon"
-					imgPath={SettingsImg}
-				/>
+				{!this.state.infoOpen && (
+					<Button
+						className="SettingsButton IconButton--small"
+						handleClick={this.toggleSettings}
+						type="icon"
+						imgPath={SettingsImg}
+					/>
+				)}
 			</div>
 		);
 	}

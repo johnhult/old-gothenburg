@@ -155,7 +155,7 @@ input:focus + .MovingText, textarea:focus + .MovingText {
 	transform: translate3d(0, -100%, 0) scale(0.8);
 }
 .InputFile:focus + .FileFocus, .InputFile:active + .FileFocus {
-	background: darken($blue, 20%);
+	background: rgba(black, 0.3);
 }
 .InputFile {
 	width: 0.1px;

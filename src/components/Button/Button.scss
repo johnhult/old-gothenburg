@@ -1,12 +1,13 @@
 @import 'style-extra/variables.scss';
 
 .btn {
-	padding: 5px 20px;
+	padding: 5px 30px;
 	max-width: 100%;
 	background-color: white;
 	border-radius: 200px;
 	transition: .2s;
 	font-weight: 900;
+	font-size: 1.2rem;
 	color: darken($blue, 10%);
 	color: $purple;
 	user-select: none;

@@ -24,11 +24,13 @@ class MarkerInfo extends Component {
 		return !this.props.infoLoading && this.props.markerInfo ? (
 			<div className="MarkerText">
 				<h1 className="MarkerHeader">{this.props.markerInfo.header}</h1>
-				<AudioPlayer
-					markerKey={this.props.markerInfo.key}
-					infoOpen={this.props.infoOpen}
-					audioPath={this.props.markerInfo.audioPath}
-				/>
+				{this.props.markerInfo.audioPath && (
+					<AudioPlayer
+						markerKey={this.props.markerInfo.key}
+						infoOpen={this.props.infoOpen}
+						audioPath={this.props.markerInfo.audioPath}
+					/>
+				)}
 				{this.props.markerInfo.text
 					.split('\\n\\n')
 					.map((text, index) => {

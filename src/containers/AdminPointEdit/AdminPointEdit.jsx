@@ -42,18 +42,24 @@ class AdminPointEdit extends Component {
 	}
 
 	validateFields = () => {
-		return Object.keys(this.state.values).every(
-			key => this.state.values[key]
-		);
+		return Object.keys(this.state.values).every(key => {
+			let passed =
+				key === 'audioEng' || key === 'audioSwe'
+					? true
+					: this.state.values[key];
+			return passed;
+		});
 	};
 
 	handleBlur = event => {
 		let name = event.target.name;
 		let value = event.target.value;
+		let fixedValue =
+			name === 'audioEng' || name === 'audioSwe' ? false : !value;
 		this.setState({
 			error: {
 				...this.state.error,
-				[name]: !value
+				[name]: fixedValue
 			}
 		});
 	};
@@ -91,7 +97,11 @@ class AdminPointEdit extends Component {
 		if (!this.validateFields()) {
 			let error = {};
 			Object.keys(this.state.error).forEach(key => {
-				error[key] = !this.state.values[key];
+				let fixedValue =
+					key === 'audioEng' || key === 'audioSwe'
+						? false
+						: !this.state.values[key];
+				error[key] = fixedValue;
 			});
 			this.setState({
 				error: error
@@ -108,28 +118,30 @@ class AdminPointEdit extends Component {
 			this.handleAddNew(firebase, storageRef, db);
 		}
 		else if (this.props.editMode === 'edit') {
-			this.handleEdit(firebase, storageRef);
+			this.handleEdit(firebase, db);
 		}
 	};
 
-	handleEdit = (firebase, storageRef) => {
+	handleEdit = (firebase, db) => {
 		if (this.state.valuesChanged.length <= 0) {
 			return;
 		}
+		const engRef = this.props.marker.markerInfoEng || db.collection('markerDataEng').doc();
+		const sweRef = this.props.marker.markerInfoSwe || db.collection('markerDataSwe').doc();
 		const match = {
 			audioEng: this.props.markerInfo.eng.audioPath,
 			audioSwe: this.props.markerInfo.swe.audioPath,
 			headerEng: {
-				ref: this.props.marker.markerInfoEng,
+				ref: engRef,
 				value: 'header'
 			},
 			headerSwe: {
-				ref: this.props.marker.markerInfoSwe,
+				ref: sweRef,
 				value: 'header'
 			},
 			markerType: { ref: this.props.marker.selfReference, value: 'type' },
-			textEng: { ref: this.props.marker.markerInfoEng, value: 'text' },
-			textSwe: { ref: this.props.marker.markerInfoSwe, value: 'text' }
+			textEng: { ref: engRef, value: 'text' },
+			textSwe: { ref: sweRef, value: 'text' }
 		};
 		let batch = this.props.db.batch();
 		let audioPromises = { changed: [], tasks: [] };
@@ -137,22 +149,32 @@ class AdminPointEdit extends Component {
 			let audio = changed.includes('audio');
 			if (audio) {
 				let lang = changed.replace('audio', '').toLowerCase();
+
+				// Create new audio file task
 				audioPromises.tasks.push(this.createAudioObject(lang));
 				audioPromises.changed.push(lang);
-				audioPromises.tasks.push(
-					firebase
-						.storage()
-						.refFromURL(match[changed])
-						.delete()
-				);
-				audioPromises.changed.push(lang);
+
+				// Delete task
+				if (match[changed]) {
+					let url = firebase.storage().refFromURL(match[changed]);
+					audioPromises.tasks.push(url.delete());
+					audioPromises.changed.push(lang);
+				}
 			}
 			else {
-				batch.update(match[changed].ref, {
+				batch.set(match[changed].ref, {
 					[match[changed].value]: this.state.values[changed]
-				});
+				}, {merge: true});
 			}
 		});
+
+		// Extra for if marker info swe or eng didn't exist before edit
+		if (!this.props.marker.markerInfoEng) {
+			batch.update(this.props.marker.selfReference, {markerInfoEng: engRef});
+		}
+		if (!this.props.marker.markerInfoSwe) {
+			batch.update(this.props.marker.selfReference, {markerInfoSwe: sweRef});
+		}
 
 		// Create new object for adding urls with correct language
 		let newUrls = { lang: [], tasks: [] };
@@ -174,13 +196,13 @@ class AdminPointEdit extends Component {
 			// Send promise up
 			return urlPromises.then(urls => {
 				urls.forEach((url, i) => {
-					if (newUrls.lang[i] === 'swe') {
-						let swe = this.props.marker.markerInfoSwe;
-						batch.update(swe, { audioPath: url });
-					}
 					if (newUrls.lang[i] === 'eng') {
-						let eng = this.props.marker.markerInfoEng;
+						let eng = engRef;
 						batch.update(eng, { audioPath: url });
+					}
+					if (newUrls.lang[i] === 'swe') {
+						let swe = sweRef;
+						batch.update(swe, { audioPath: url });
 					}
 				});
 				// Send promise up
@@ -225,34 +247,43 @@ class AdminPointEdit extends Component {
 	};
 
 	handleAddNew = (firebase, storageRef, db) => {
+		let audioArray = [
+			this.state.values.audioEng ? this.createAudioObject('eng') : '',
+			this.state.values.audioSwe ? this.createAudioObject('swe') : ''
+		];
+
 		// Promise for both
-		let uploadAudio = Promise.all([
-			this.createAudioObject('eng'),
-			this.createAudioObject('swe')
-		]);
+		let uploadAudio = Promise.all(audioArray);
+
 		// When audio upload is done we can get url and create markerInfo for both markers
 		let allDone = uploadAudio.then(promise => {
 			// Getting urls is async so we need promise
 			let urlsArray = promise.map(querySnapshot => {
 				// Return array of promises
-				return querySnapshot.ref.getDownloadURL();
+				return querySnapshot.ref
+					? querySnapshot.ref.getDownloadURL()
+					: '';
 			});
 
 			// Create ref which we'll use for reference when creating marker
 			let engRef = db.collection('markerDataEng').doc();
 			let sweRef = db.collection('markerDataSwe').doc();
+
 			// Create promise for both urls
 			let uploadMarkerDataPromise = Promise.all(urlsArray);
+
 			// New promise for batch
 			let markersDonePromise = uploadMarkerDataPromise.then(urlValues => {
 				// We now have urls so we map those to object
-				let url = urlValues.map(item => item);
+				let url = urlValues.map(item => (item ? item : ''));
+
 				// Create and upload both objects. Since promise always returns indexed urls we know 0 will be eng and 1 will be swe
 				let eng = this.createAddObject('eng', url[0]);
 				let swe = this.createAddObject('swe', url[1]);
 				let batch = db.batch();
 				batch.set(engRef, eng);
 				batch.set(sweRef, swe);
+
 				// Return batch commit so we can use check when both marker infos are done
 				return batch.commit();
 			});
@@ -300,29 +331,36 @@ class AdminPointEdit extends Component {
 			headerEng: this.props.markerInfo.eng.header,
 			headerSwe: this.props.markerInfo.swe.header,
 			markerType: this.props.marker.type,
-			textEng: this.props.markerInfo.swe.text.replace(/\\n\\n/g, '\n\n'),
-			textSwe: this.props.markerInfo.eng.text.replace(/\\n\\n/g, '\n\n')
+			textEng: this.props.markerInfo.eng.text.replace(/\\n\\n/g, '\n\n'),
+			textSwe: this.props.markerInfo.swe.text.replace(/\\n\\n/g, '\n\n')
 		};
 		this.setState({ values: setValues }, () => {
 			let proms = ['eng', 'swe'].map(lang => {
-				let file = this.props.storage.refFromURL(
-					this.props.markerInfo[lang].audioPath
-				);
-				return this.srcToFile(
-					this.props.markerInfo[lang].audioPath,
-					file.name,
-					'audio/mp3'
-				);
+				if (this.props.markerInfo[lang].audioPath) {
+					let file = this.props.storage.refFromURL(
+						this.props.markerInfo[lang].audioPath
+					);
+					return this.srcToFile(
+						this.props.markerInfo[lang].audioPath,
+						file.name,
+						'audio/mp3'
+					);
+				}
+				else {
+					return '';
+				}
 			});
 			Promise.all(proms).then(audio => {
 				this.setState({ loadAudio: false }, () => {
 					audio.forEach((item, i) => {
-						let input = document.querySelector(
-							`input[name=audio${i === 0 ? 'Eng' : 'Swe'}]`
-						);
-						let dataTransfer = new DataTransfer();
-						dataTransfer.items.add(audio[i]);
-						input.files = dataTransfer.files;
+						if (item) {
+							let input = document.querySelector(
+								`input[name=audio${i === 0 ? 'Eng' : 'Swe'}]`
+							);
+							let dataTransfer = new DataTransfer();
+							dataTransfer.items.add(audio[i]);
+							input.files = dataTransfer.files;
+						}
 					});
 					this.addDropEvents();
 					this.setState({ changeValueAudio: true });
@@ -624,10 +662,7 @@ class AdminPointEdit extends Component {
 									handleClick={this.handleSubmit}
 									disabled={
 										this.state.loading ||
-										(!this.props.marker &&
-											!this.props.markerInfo &&
-											this.state.valuesChanged.length <=
-												0 &&
+										(this.state.valuesChanged.length <= 0 &&
 											this.props.editMode === 'edit')
 									}
 								/>
