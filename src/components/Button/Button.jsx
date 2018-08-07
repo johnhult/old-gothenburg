@@ -13,6 +13,9 @@ class Button extends Component {
 	render() {
 		return (
 			<button
+				aria-label={
+					this.props.type === 'icon' ? this.props.iconLabel : ''
+				}
 				disabled={this.props.disabled}
 				className={`btn ${this.props.className || ''} ${
 					this.props.type === 'icon' ? 'IconButton' : ''

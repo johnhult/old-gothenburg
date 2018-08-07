@@ -3,7 +3,8 @@
   height: 30px;
   margin: 0 10px;
   position: relative;
-  transform: rotateZ(45deg); }
+  transform: rotateZ(45deg);
+  cursor: pointer; }
   .CloseIcon::before, .CloseIcon::after {
     content: "";
     position: absolute;

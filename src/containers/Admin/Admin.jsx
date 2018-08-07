@@ -1,40 +1,21 @@
 import React from 'react';
-import GoogleMapReact from 'google-map-react';
+// import GoogleMapReact from 'google-map-react';
 import firebase from 'firebase/app';
 import 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/storage';
 import 'firebase/auth';
+// import supercluster from 'points-cluster';
 
 import AdminPointEdit from 'containers/AdminPointEdit/AdminPointEdit.jsx';
 import AdminUtility from 'components/AdminUtility/AdminUtility.jsx';
 import Login from 'components/Login/Login.jsx';
-import Marker from 'components/Marker/Marker.jsx';
+import Map from 'components/Map/Map.jsx';
 import Overlay from 'components/Overlay/Overlay.jsx';
 import Spinner from 'components/Spinner/Spinner.jsx';
 
-import MapStyle from 'data/MAP-STYLE.json';
-import './Admin.css';
 import { getEmptyMarkerInfo } from '../../util/util';
-
-const MAP = {
-	defaultCenter: {
-		lat: 57.70887,
-		lng: 11.97456
-	},
-	defaultZoom: 14,
-	options: {
-		clickableIcons: false,
-		draggable: true,
-		fullscreenControl: false,
-		maxZoom: 19,
-		minZoom: 8,
-		panControl: true,
-		scrollwheel: true,
-		styles: MapStyle,
-		zoomControl: true
-	}
-};
+import './Admin.css';
 
 const ERROR = {
 	noMarkers: 'Couldn\'t load markers. 😭 Please reload or try later.'
@@ -62,9 +43,6 @@ class Admin extends React.Component {
 			showRemove: false
 		};
 		this.db = null;
-		this.map = null;
-		this.maps = null;
-		this.newMarker = null;
 		this.storage = null;
 	}
 
@@ -72,15 +50,6 @@ class Admin extends React.Component {
 		this.setState({
 			isSignedIn: !!user
 		});
-	};
-
-	initMap = (map, maps) => {
-		this.map = map;
-		this.maps = maps;
-		this.maps.event.addListener(map, 'click', event => {
-			this.addPoint(event.latLng);
-		});
-		this.getMarkers(this.initFirebase());
 	};
 
 	initFirebase() {
@@ -116,12 +85,7 @@ class Admin extends React.Component {
 						};
 						markers.push(marker);
 					});
-					this.setState(
-						{ loadingMarkers: false, markers: markers },
-						() => {
-							this.setBounds();
-						}
-					);
+					this.setState({ loadingMarkers: false, markers: markers });
 				},
 				() => {
 					this.setState({
@@ -133,67 +97,13 @@ class Admin extends React.Component {
 	};
 
 	getMessage = () => {
-		if (this.state.loadingMarkers) {
-			return (
-				<div className="InfoMessage">
-					<Spinner size={30} margins="10px 10px 10px 0" />
-					<span>Loading markers</span>
-				</div>
-			);
-		}
-		else if (this.state.error) {
+		if (this.state.error) {
 			return (
 				<div className="InfoMessage">
 					<span>{this.state.error}</span>
 				</div>
 			);
 		}
-	};
-
-	setMapOptions = () => {
-		let options = this.state.showEdit
-			? {
-				draggable: false,
-				maxZoom: this.map.getZoom(),
-				minZoom: this.map.getZoom(),
-				panControl: false,
-				scrollwheel: false,
-				zoomControl: false
-			  }
-			: {
-				...MAP.options
-			  };
-		this.map.setOptions(options);
-	};
-
-	setBounds = () => {
-		let newBounds = new this.maps.LatLngBounds();
-		this.state.markers.forEach(item => {
-			newBounds.extend({
-				lat: item.geo.latitude,
-				lng: item.geo.longitude
-			});
-		});
-
-		let increasePercentage = 1.01;
-		let NE = newBounds.getNorthEast();
-		let SW = newBounds.getSouthWest();
-
-		// Increase bounds
-		let latAdjustment = (NE.lat() - SW.lat()) * (increasePercentage - 1);
-		let lngAdjustment = (NE.lng() - SW.lng()) * (increasePercentage - 1);
-		var newNE = new this.maps.LatLng(
-			NE.lat() + latAdjustment,
-			NE.lng() + lngAdjustment
-		);
-		var newSW = new this.maps.LatLng(
-			SW.lat() - latAdjustment,
-			SW.lng() - lngAdjustment
-		);
-
-		let fitBounds = new this.maps.LatLngBounds(newSW, newNE);
-
-		this.map.fitBounds(fitBounds);
 	};
 
 	toggleActiveButton = buttonToToggle => {
@@ -206,7 +116,7 @@ class Admin extends React.Component {
 		});
 	};
 
-	getMarkerInfo = clickedMarkerId => {
+	getMarkerInfo = (clickedMarkerId, map) => {
 		if (this.state.activeButton === 'remove') {
 			this.setState({
 				showRemove: true
@@ -219,23 +129,18 @@ class Admin extends React.Component {
 			loadedMarker: marker
 		});
 		if (this.state.activeButton === 'edit') {
-			this.map.panTo({
+			map.panTo({
 				lat: marker.geo.latitude,
 				lng: marker.geo.longitude
 			});
-			this.setState(
-				{
-					loadedMarker: marker,
-					pointToEdit: {
-						lat: marker.geo.latitude,
-						lng: marker.geo.longitude
-					},
-					showEdit: true
+			this.setState({
+				loadedMarker: marker,
+				pointToEdit: {
+					lat: marker.geo.latitude,
+					lng: marker.geo.longitude
 				},
-				() => {
-					this.setMapOptions();
-				}
-			);
+				showEdit: true
+			});
 		}
 
 		// Get marker data
@@ -263,23 +168,13 @@ class Admin extends React.Component {
 		if (this.state.activeButton !== 'add' || this.state.showEdit) {
 			return;
 		}
-		this.map.panTo(latLng);
-		this.newMarker = new this.maps.Marker({
-			map: this.map,
-			position: latLng
-		});
-		this.setState(
-			{
-				pointToEdit: {
-					lat: latLng.lat(),
-					lng: latLng.lng()
-				},
-				showEdit: true
+		this.setState({
+			pointToEdit: {
+				lat: latLng.lat,
+				lng: latLng.lng
 			},
-			() => {
-				this.setMapOptions();
-			}
-		);
+			showEdit: true
+		});
 	};
 
 	deleteMarker = () => {
@@ -336,7 +231,7 @@ class Admin extends React.Component {
 		});
 	};
 
-	handleChildClick = clickedMarkerId => {
+	handleChildClick = (clickedMarkerId, map) => {
 		if (
 			(this.state.activeButton !== 'remove' &&
 				this.state.activeButton !== 'edit') ||
@@ -348,14 +243,11 @@ class Admin extends React.Component {
 			this.state.activeButton === 'remove' ||
 			this.state.activeButton === 'edit'
 		) {
-			this.getMarkerInfo(clickedMarkerId);
+			this.getMarkerInfo(clickedMarkerId.id, map);
 		}
 	};
 
 	closeEdit = () => {
-		if (this.state.activeButton === 'add') {
-			this.newMarker.setMap(null);
-		}
 		this.setState({
 			activeButton: '',
 			loadedMarker: null,
@@ -373,28 +265,21 @@ class Admin extends React.Component {
 		});
 	};
 
-	componentDidUpdate = (prevProps, prevState) => {
-		if (
-			!this.state.showEdit &&
-			this.state.showEdit !== prevState.showEdit
-		) {
-			this.setMapOptions();
-		}
+	onLogin = user => {
+		this.setState({ isSignedIn: !!user });
+		this.getMarkers(this.initFirebase());
 	};
 
 	// Listen to the Firebase Auth state and set the local state.
 	componentWillMount = () => {
 		this.unregisterAuthObserver = firebase
 			.auth()
-			.onAuthStateChanged(user => this.setState({ isSignedIn: !!user }));
+			.onAuthStateChanged(user => this.onLogin(user));
 	};
 
 	componentWillUnmount() {
 		// Make sure we un-register Firebase observers when the component unmounts.
 		this.unregisterAuthObserver();
-		if (this.maps) {
-			this.maps.event.clearListeners(this.map, 'clicked');
-		}
 	}
 
 	render() {
@@ -455,31 +340,29 @@ class Admin extends React.Component {
 				>
 					{this.getMessage()}
 					<div className="MapInner">
-						<GoogleMapReact
-							bootstrapURLKeys={{
-								key: this.props.apiKey
-							}}
-							defaultCenter={MAP.defaultCenter}
-							defaultZoom={MAP.defaultZoom}
-							experimental
-							onChildClick={this.handleChildClick}
-							onGoogleApiLoaded={({ map, maps }) =>
-								this.initMap(map, maps)
-							}
-							options={MAP.options}
-							yesIWantToUseGoogleMapApiInternals
-						>
-							{this.state.markers.map(marker => {
-								return (
-									<Marker
-										key={marker.id}
-										lat={marker.geo.latitude}
-										lng={marker.geo.longitude}
-										type={marker.type}
-									/>
-								);
-							})}
-						</GoogleMapReact>
+						{this.state.markers.length > 0 ? (
+							<Map
+								admin={true}
+								apiKey={this.props.apiKey}
+								className="Map"
+								handleClick={this.addPoint}
+								handleMarkerClick={this.handleChildClick}
+								infoOpen={this.state.showEdit}
+								language="en"
+								markers={this.state.markers}
+								shouldReactToClick={
+									this.state.activeButton === 'add'
+								}
+							/>
+						) : (
+							<div className="Loading">
+								<div>
+									<Spinner />
+									<h1>Loading markers 🎵</h1>
+									<h4>Please wait</h4>
+								</div>
+							</div>
+						)}
 					</div>
 					<AdminPointEdit
 						closeEdit={this.closeEdit}

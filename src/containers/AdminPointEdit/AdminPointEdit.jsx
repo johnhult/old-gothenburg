@@ -126,8 +126,12 @@ class AdminPointEdit extends Component {
 		if (this.state.valuesChanged.length <= 0) {
 			return;
 		}
-		const engRef = this.props.marker.markerInfoEng || db.collection('markerDataEng').doc();
-		const sweRef = this.props.marker.markerInfoSwe || db.collection('markerDataSwe').doc();
+		const engRef =
+			this.props.marker.markerInfoEng ||
+			db.collection('markerDataEng').doc();
+		const sweRef =
+			this.props.marker.markerInfoSwe ||
+			db.collection('markerDataSwe').doc();
 		const match = {
 			audioEng: this.props.markerInfo.eng.audioPath,
 			audioSwe: this.props.markerInfo.swe.audioPath,
@@ -162,18 +166,29 @@ class AdminPointEdit extends Component {
 				}
 			}
 			else {
-				batch.set(match[changed].ref, {
-					[match[changed].value]: this.state.values[changed]
-				}, {merge: true});
+				let value = changed.includes('text')
+					? this.state.values[changed].replace('\n\n', '\\n\\n')
+					: this.state.values[changed];
+				batch.set(
+					match[changed].ref,
+					{
+						[match[changed].value]: value
+					},
+					{ merge: true }
+				);
 			}
 		});
 
 		// Extra for if marker info swe or eng didn't exist before edit
 		if (!this.props.marker.markerInfoEng) {
-			batch.update(this.props.marker.selfReference, {markerInfoEng: engRef});
+			batch.update(this.props.marker.selfReference, {
+				markerInfoEng: engRef
+			});
 		}
 		if (!this.props.marker.markerInfoSwe) {
-			batch.update(this.props.marker.selfReference, {markerInfoSwe: sweRef});
+			batch.update(this.props.marker.selfReference, {
+				markerInfoSwe: sweRef
+			});
 		}
 
 		// Create new object for adding urls with correct language
@@ -226,7 +241,7 @@ class AdminPointEdit extends Component {
 		return {
 			audioPath: url,
 			header: this.state.values[header],
-			text: this.state.values[text]
+			text: this.state.values[text].replace('\n\n', '\\n\\n')
 		};
 	};
 

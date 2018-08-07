@@ -24,8 +24,11 @@ class Settings extends Component {
 					</span>
 					<div className="LanguageWrapper u-bigMargin">
 						<div
-							className={`LanguageChoice ${this.props.language ===
-								'sv' && 'LanguageChoice--active'}`}
+							className={`LanguageChoice ${
+								this.props.language === 'sv'
+									? 'LanguageChoice--active'
+									: ''
+							}`}
 							onClick={() =>
 								this.props.handleLanguageSwitch('sv')
 							}
@@ -33,8 +36,11 @@ class Settings extends Component {
 							🇸🇪 Svenska
 						</div>
 						<div
-							className={`LanguageChoice ${this.props.language !==
-								'sv' && 'LanguageChoice--active'}`}
+							className={`LanguageChoice ${
+								this.props.language !== 'sv'
+									? 'LanguageChoice--active'
+									: ''
+							}`}
 							onClick={() =>
 								this.props.handleLanguageSwitch('en')
 							}
@@ -42,11 +48,11 @@ class Settings extends Component {
 							🇬🇧 English
 						</div>
 					</div>
-					<div className="TutorialWrapper u-bigMargin">
-						<span
-							className="u-greyText u-fatText"
-							onClick={this.props.handleShowTutorial}
-						>
+					<div
+						className="TutorialWrapper u-bigMargin"
+						onClick={this.props.handleShowTutorial}
+					>
+						<span className="u-greyText u-fatText">
 							{this.props.language === 'sv'
 								? 'Visa hjälp'
 								: 'Show tutorial'}

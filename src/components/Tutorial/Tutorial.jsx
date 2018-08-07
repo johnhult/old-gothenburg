@@ -42,6 +42,19 @@ class Tutorial extends Component {
 				/>
 			);
 		});
+		let labelButton;
+		if (this.props.language === 'sv') {
+			labelButton =
+				this.state.steps.current === this.state.steps.all.length - 1
+					? 'Utforska!'
+					: 'Nästa';
+		}
+		else {
+			labelButton =
+				this.state.steps.current === this.state.steps.all.length - 1
+					? 'Explore!'
+					: 'Next';
+		}
 		return (
 			<div className="OverlayBg">
 				<div className="Tutorial">
@@ -54,16 +67,15 @@ class Tutorial extends Component {
 						<div className="TutorialButtonWrapper">
 							<Button
 								className="SkipTextButton"
-								label="Skip"
+								label={
+									this.props.language === 'sv'
+										? 'Hoppa över'
+										: 'Skip'
+								}
 								handleClick={this.props.onDone}
 							/>
 							<Button
-								label={
-									this.state.steps.current ===
-									this.state.steps.all.length - 1
-										? 'Explore!'
-										: 'Next'
-								}
+								label={labelButton}
 								handleClick={() =>
 									this.goToStep(this.state.steps.current + 1)
 								}

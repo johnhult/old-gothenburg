@@ -6,6 +6,7 @@
 	margin: 0 10px;
 	position: relative;
 	transform: rotateZ(45deg);
+	cursor: pointer;
 	&::before, &::after {
 		content: "";
 		position: absolute;

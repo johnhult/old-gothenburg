@@ -191,7 +191,8 @@ class Home extends Component {
 	showTutorial = () => {
 		this.setState({
 			shouldShowTutorial: true,
-			showSettings: false
+			showSettings: false,
+			tutorialDone: false
 		});
 	};
 
@@ -335,6 +336,7 @@ class Home extends Component {
 				/>
 				{!this.state.infoOpen && (
 					<Button
+						iconLabel="Settings"
 						className="SettingsButton IconButton--small"
 						handleClick={this.toggleSettings}
 						type="icon"

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactSVG from 'react-svg';
+import PropTypes from 'prop-types';
 
 import buildingMarker from 'img/icons/marker-building.svg';
 import cultureMarker from 'img/icons/marker-culture.svg';
@@ -12,6 +13,17 @@ const paths = {
 	culture: cultureMarker,
 	information: infoMarker,
 	user: userMarker
+};
+
+const MarkerShadow = {
+	background:
+		'radial-gradient(ellipse at center, rgba(0,0,0,0.6), rgba(0,0,0,0) 40%)',
+	bottom: '-5px',
+	height: '10px',
+	left: '0',
+	position: 'absolute',
+	width: '100%',
+	zIndex: '-1'
 };
 
 class Marker extends Component {
@@ -54,6 +66,7 @@ class Marker extends Component {
 					svgClassName={this.props.type}
 					path={this.getMarkerPath(this.props.type)}
 				/>
+				{this.props.type !== 'user' && <div style={MarkerShadow} />}
 			</div>
 		);
 	}
@@ -65,6 +78,7 @@ Marker.defaultProps = {
 };
 
 Marker.PropTypes = {
+	type: PropTypes.string
 	//	Example PropTypes:
 	//	label: PropTypes.string.isRequired,
 	//	onClick: PropTypes.func,

@@ -37,20 +37,21 @@ class Map extends Component {
 			error: null,
 			geolocation: null,
 			loaded: false,
-			map: null,
 			mapOptions: {
 				bounds: null,
 				center: { ...this.props.userPos },
 				zoom: MAP.defaultZoom
 			},
-			maps: null,
 			openMarker: null
 		};
+		this.map = null;
+		this.maps = null;
+		this.newMarker = null;
 	}
 
 	centerOnUser = () => {
-		this.state.map.setZoom(16);
-		this.state.map.panTo(this.props.userPos);
+		this.map.setZoom(16);
+		this.map.panTo(this.props.userPos);
 	};
 
 	getClusters = () => {
@@ -85,7 +86,7 @@ class Map extends Component {
 		});
 	};
 
-	setDefaultBounds = (map, maps) => {
+	setDefaultBounds = (map, maps, skipFit) => {
 		let newBounds = new maps.LatLngBounds();
 		this.props.markers.forEach(item => {
 			newBounds.extend({
@@ -123,7 +124,9 @@ class Map extends Component {
 
 		let fitBounds = new maps.LatLngBounds(newSW, newNE);
 
-		map.fitBounds(fitBounds);
+		if (!skipFit) {
+			map.fitBounds(fitBounds);
+		}
 
 		return otherBounds;
 	};
@@ -145,7 +148,7 @@ class Map extends Component {
 				}
 			},
 			() => {
-				this.createClusters(this.props);
+				this.createClusters();
 			}
 		);
 	};
@@ -167,28 +170,30 @@ class Map extends Component {
 			this.zoomOnCluster(clickedMarker);
 		}
 		else {
-			this.setState({
-				openMarker: key
-			});
 			let clickedMarker = this.props.markers.find(
 				correctMarker => correctMarker.id === keyId
 			);
-			this.state.map.panTo({
-				lat: clickedMarker.geo.latitude,
-				lng: clickedMarker.geo.longitude
-			});
-			this.props.handleMarkerClick(clickedMarker);
+			if (!this.props.admin) {
+				this.setState({
+					openMarker: key
+				});
+				this.map.panTo({
+					lat: clickedMarker.geo.latitude,
+					lng: clickedMarker.geo.longitude
+				});
+			}
+			this.props.handleMarkerClick(clickedMarker, this.map);
 		}
 	};
 
 	zoomOnCluster(clickedMarker) {
-		let zoom = this.state.map.getZoom();
-		this.state.map.panTo({
+		let zoom = this.map.getZoom();
+		this.map.panTo({
 			lat: clickedMarker.lat,
 			lng: clickedMarker.lng
 		});
 		zoom = zoom + 2 > MAP.options.maxZoom ? MAP.options.maxZoom : zoom + 2;
-		this.state.map.setZoom(zoom);
+		this.map.setZoom(zoom);
 	}
 
 	initMap = (map, maps) => {
@@ -199,12 +204,15 @@ class Map extends Component {
 			});
 			return;
 		}
+		maps.event.addListenerOnce(map, 'idle', () => {
+			document.getElementsByTagName('iframe')[0].title = 'Google Maps';
+		});
+		this.map = map;
+		this.maps = maps;
 		this.setState(
 			{
 				bounds: this.setDefaultBounds(map, maps),
-				loaded: true,
-				map: map,
-				maps: maps
+				loaded: true
 			},
 			() => {
 				this.handleMapChange(
@@ -218,23 +226,62 @@ class Map extends Component {
 		);
 	};
 
-	componentDidUpdate() {
+	adminClick = ({ lat, lng }) => {
+		if (
+			!this.props.admin ||
+			this.props.infoOpen ||
+			!this.props.shouldReactToClick
+		) {
+			return;
+		}
+		let latLng = { lat: lat, lng: lng };
+		this.map.panTo(latLng);
+		this.newMarker = new this.maps.Marker({
+			map: this.map,
+			position: latLng
+		});
+		this.props.handleClick(latLng);
+	};
+
+	componentDidUpdate(prevProps) {
 		if (!this.state.loaded) {
 			return;
 		}
-		let options = this.props.infoOpen
-			? {
-				draggable: false,
-				maxZoom: this.state.map.getZoom(),
-				minZoom: this.state.map.getZoom(),
-				panControl: false,
-				scrollwheel: false,
-				zoomControl: false
-			  }
-			: {
-				...MAP.options
-			  };
-		this.state.map.setOptions(options);
+		if (prevProps.infoOpen !== this.props.infoOpen) {
+			let options = this.props.infoOpen
+				? {
+					draggable: false,
+					maxZoom: this.map.getZoom(),
+					minZoom: this.map.getZoom(),
+					panControl: false,
+					scrollwheel: false,
+					zoomControl: false
+				  }
+				: {
+					...MAP.options
+				  };
+			this.map.setOptions(options);
+			if (this.props.admin && !this.props.infoOpen && this.newMarker) {
+				this.newMarker.setMap(null);
+				this.newMarker = null;
+			}
+		}
+		if (prevProps.markers.length !== this.props.markers.length) {
+			this.setState(
+				{
+					bounds: this.setDefaultBounds(this.map, this.maps, true)
+				},
+				() => {
+					this.handleMapChange(
+						{
+							center: this.state.mapOptions.center,
+							zoom: this.state.mapOptions.zoom
+						},
+						true
+					);
+				}
+			);
+		}
 	}
 
 	render() {
@@ -246,6 +293,7 @@ class Map extends Component {
 					}}
 					defaultCenter={MAP.defaultCenter}
 					defaultZoom={MAP.defaultZoom}
+					onClick={this.adminClick}
 					experimental
 					onChange={this.handleMapChange}
 					onChildClick={this.handleChildClick}
@@ -308,12 +356,15 @@ class Map extends Component {
 Map.defaultProps = {};
 
 Map.propTypes = {
+	admin: PropTypes.bool,
 	apiKey: PropTypes.string,
 	className: PropTypes.string,
+	handleClick: PropTypes.func,
 	handleMarkerClick: PropTypes.func.isRequired,
 	infoOpen: PropTypes.bool.isRequired,
 	language: PropTypes.string,
 	markers: PropTypes.array,
+	shouldReactToClick: PropTypes.bool,
 	userError: PropTypes.string,
 	userPos: PropTypes.object
 };
